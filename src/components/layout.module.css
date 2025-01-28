@@ -1,0 +1,26 @@
+.scrollable {
+    scrollbar-width: none; /* Personaliza la barra en navegadores compatibles */
+    scrollbar-color: #A65C99 transparent; /* Colores del scroll en navegadores modernos */
+  }
+  
+  /* Para navegadores WebKit (Chrome, Edge, Safari) */
+  .scrollable::-webkit-scrollbar {
+    width: 2px; /* Ancho de la barra */
+  }
+  
+  /* Eliminar las flechas (solo en Webkit) */
+  .scrollable::-webkit-scrollbar-button {
+    display: none; /* Esto elimina las flechas de arriba y abajo */
+  }
+  
+  /* Barra de desplazamiento redondeada */
+  .scrollable::-webkit-scrollbar-thumb {
+    background: #A65C99; /* Color de la barra */
+    border-radius: 8px; /* Bordes redondeados de la barra */
+  }
+  
+  /* Fondo de la pista (la parte donde se mueve el thumb) */
+  .scrollable::-webkit-scrollbar-track {
+    background: transparent; /* Fondo transparente */
+  }
+  
