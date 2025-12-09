@@ -16,9 +16,9 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
   };
 
 
-  const handleDelete = async (idEvaluacion, idEvaluador) => {
+  const handleDelete = async (idEvaluacion, idEvaluador, idTipoEvaluacion) => {
     try {
-      await axios.delete(`${URLBASE}/evaluaciones/disponible`, {params: {idEvaluacion, idEvaluador, idColaborador}})
+      await axios.delete(`${URLBASE}/evaluaciones/disponible`, {params: {idEvaluacion, idEvaluador, idColaborador, idTipoEvaluacion}});
       toast.success('Información actualizada con existo!')
       if (buscarUsuario) buscarUsuario();
     } catch (error) {
@@ -86,7 +86,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                 </p>
               </div>
               <button
-                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador)}
+                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador, evaluacion.TipoEvaluacione)}
                 className="bg-znaranja text-white px-3 py-1 rounded-lg hover:scale-105 hover:bg-znaranja/80 disabled:bg-znaranja/70 disabled:cursor-not-allowed"
                 disabled={isDisabledAfterDays(evaluacion.createdAt, 6)}
               >
