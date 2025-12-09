@@ -83,7 +83,7 @@ export const PieChartCumplimiento = ({ nombre, data }) => {
 
 
   return (
-    <ResponsiveContainer width="50%" aspect={2}>
+    <ResponsiveContainer width="100%" aspect={2}>
       <div className="flex justify-center items-center flex-col">
         <h2 className="text-znaranja font-bold text-xl">{nombre}</h2>
         {
@@ -96,7 +96,7 @@ export const PieChartCumplimiento = ({ nombre, data }) => {
         }
       </div>
       {/* paddingAngle={2} */}
-      <PieChart width={600} height={300}>
+      <PieChart width={600} height={300} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
         <Pie data={data} dataKey='value' label innerRadius="60%" outerRadius="80%" cx="50%" cy="50%">
           {
             data?.map((entry, index) => (

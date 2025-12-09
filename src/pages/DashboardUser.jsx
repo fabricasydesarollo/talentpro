@@ -52,7 +52,6 @@ const DashboardUser = () => {
         axios.get(`${URLBASE}/informes/resultados`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
         axios.get(`${URLBASE}/informes/resultados/evaluador`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
       ]);
-      console.log(competenciasRes.data, cubrimientoRes.data)
       setCalificaciones(calificacionesRes.data?.data || []);
       setCubrimiento(cubrimientoRes.data?.data || []);
       setCompetencias(competenciasRes.data?.data || []);
@@ -76,8 +75,6 @@ const DashboardUser = () => {
     },
     { totalSupera: 0, totalMenor: 0 } // Inicialización del acumulador
   );
-
-  console.log(resultado);
 
   //1. Lista de promedios de competencias
   const promedios = promediosUsuario.map((competencia) => competencia.promedio);
@@ -122,12 +119,10 @@ const DashboardUser = () => {
     return <Loading />
   }
 
-
-
   return (
     <div className="w-full p-5">
       <h1 className="text-4xl font-extrabold text-zvioleta mb-8 text-center tracking-tight">
-        Dashboard equipo
+        Mi equipo - Dashboard de desempeño
       </h1>
       <div className="flex flex-col md:flex-row md:gap-4 gap-2 items-center md:items-end text-gray-800 mb-10">
         <div className="flex flex-col">
@@ -146,8 +141,10 @@ const DashboardUser = () => {
         <button className="bg-zvioleta py-2 px-10 rounded-lg text-white hover:scale-105 shadow-md h-10" onClick={loadDataDashboard}>Consultar</button>
       </div>
       {
-        groupedData.length === 0 ? (
+        idEvaluacion === '0' ? (
           <p className="text-center text-red-500 mt-4">*Seleccione una evaluación para cargar el dashboard</p>
+        ) : groupedData.length == 0 ? (
+          <p className="text-center text-red-500 mt-4">* No hay datos disponibles para mostrar el dashboard</p>
         ) : (
           <div className="max-w-screen-2xl mx-auto grid md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
             <PieChartCumplimiento nombre={dataPie?.length > 0 ? 'Cubrimiento' : null} data={dataPie} />

@@ -69,7 +69,7 @@ const InformeDetalleGrupo = () => {
 
     return (
         <div className='max-w-screen-2xl p-5 lg:max-w-screen-xl box-content mx-auto'>
-            <h1 className="text-4xl font-extrabold text-zvioleta mb-8 text-center tracking-tight">Informe de Evaluadores y Colaboradores Detalle</h1>
+            <h1 className="text-4xl font-extrabold text-zvioleta mb-8 text-center tracking-tight">Mi equipo - Detalle de evaluaciones</h1>
             <div className="flex md:gap-4 gap-2 items-end text-gray-800">
                 <div className="flex flex-col">
                 <label htmlFor="id-evaluacion">Seleccione una evaluación</label>

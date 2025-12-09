@@ -13,7 +13,7 @@ export default function TablaAvancesUI() {
     const [empresas, setEmpresas] = useState({})
     const [isLoading, setIsLoading] = useState(true); // Estado para cargar datos
     const [idEmpresa, setIdEmpresa] = useState(null); // Estado para Empresa seleccionada
-    const [idSede, setIdSede] = useState(null); // Estado para Sede seleccionada
+    const [idSede, setIdSede] = useState(0); // Estado para Sede seleccionada
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [idEvaluacion, setIdEvaluacion] = useState('0');
     const [sedes, setSedes] = useState([])
@@ -70,7 +70,7 @@ export default function TablaAvancesUI() {
         setIsLoading(true);
         
         axios.get(`${URLBASE}/informes`, {
-            params: { idEmpresa: idEmpresa, idEvaluacion: idEvaluacion }
+            params: { idEmpresa: idEmpresa, idEvaluacion: idEvaluacion, idSede: idSede == 0 ? null : idSede }
         })
             .then(res => {
                 const informesRaw = res.data?.informe || [];
@@ -132,7 +132,7 @@ export default function TablaAvancesUI() {
                         value={idSede}
                         onChange={(e) => setIdSede(e.target.value)}
                     >
-                        <option selected value='0'>TODAS</option>
+                        <option selected value={0}>TODAS</option>
                         {sedes?.map((sede, index) => (
                             <option key={index} value={sede.idSede}>{sede.nombre}</option>
                         ))}
