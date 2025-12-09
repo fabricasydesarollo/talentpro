@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import { toast } from 'react-toastify';
 import DesarrollandoTalentosLogo from '/Desarrollando_talentos_Logo.png'
