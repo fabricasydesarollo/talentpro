@@ -4,9 +4,10 @@ import Layout from './Layout';
 import { Outlet } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
+// import { URLBASE } from '../lib/actions.js';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
+import { URLBASE } from '../lib/actions.js';
 
 const ProtectedLayout = ({ allowedProfiles }) => {
   const navigate = useNavigate();
@@ -21,7 +22,6 @@ const ProtectedLayout = ({ allowedProfiles }) => {
       try {
         const res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
 
-        console.log(res)
 
         if (!res.data?.data) {
           toast.update(toastId, { render: "Sesión no válida. Redirigiendo...", type: "error", isLoading: false, autoClose: 3000 });
