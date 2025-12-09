@@ -15,6 +15,8 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
     setIsModalOpen(!isModalOpen);
   };
 
+  console.log(evaluaciones)
+
 
   const handleDelete = async (idEvaluacion, idEvaluador, idTipoEvaluacion) => {
     try {
@@ -86,7 +88,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                 </p>
               </div>
               <button
-                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador, evaluacion.TipoEvaluacione)}
+                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador, evaluacion.TipoEvaluacione?.idTipoEvaluacion)}
                 className="bg-znaranja text-white px-3 py-1 rounded-lg hover:scale-105 hover:bg-znaranja/80 disabled:bg-znaranja/70 disabled:cursor-not-allowed"
                 disabled={isDisabledAfterDays(evaluacion.createdAt, 6)}
               >
