@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { toast } from 'react-toastify';
 import Modal from 'react-modal'
 import FormUpdatePassword from '../components/FormUpdatePassword'

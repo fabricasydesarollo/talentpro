@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import { toast } from 'react-toastify';

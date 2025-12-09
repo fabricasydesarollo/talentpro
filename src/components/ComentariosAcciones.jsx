@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios'; // Para hacer peticiones HTTP
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom'; // Para la redirección
 import PropTypes from 'prop-types'

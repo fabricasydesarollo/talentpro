@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 import PropTypes from 'prop-types'
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 
 // Estilo básico para el modal (puedes personalizarlo)
 Modal.setAppElement('#root'); // Esto es necesario para accesibilidad

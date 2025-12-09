@@ -4,7 +4,7 @@ import {
   createMRTColumnHelper,
 } from 'material-react-table';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { download, generateCsv, mkConfig } from 'export-to-csv';
 import { Button, Box } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';

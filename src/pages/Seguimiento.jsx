@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
 import ComentariosAcciones from '../components/ComentariosAcciones';

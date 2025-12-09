@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { BarChartAdvance, PieChartCumplimiento } from './GraficaAvances';
 import Loading from './Loading';
 import { useUser } from '../context/UserContext';

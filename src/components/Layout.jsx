@@ -7,7 +7,7 @@ import { FaChevronLeft, FaChevronRight, FaCheckCircle, FaHome, FaCog, FaSignOutA
 } from 'react-icons/fa';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { FaChartPie, FaPerson, FaTableCells } from 'react-icons/fa6';
 import { RiDashboard3Fill, RiFileChartFill } from '@remixicon/react';
 import { HiMiniClipboardDocumentCheck } from 'react-icons/hi2';

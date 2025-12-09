@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from '../lib/actions';
+import { URLBASE } from '../lib/actions.js';
 import { toast } from "react-toastify";
 import DataTable from "../components/DataTable";
 import { useUser } from "../context/UserContext";
