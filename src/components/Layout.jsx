@@ -31,9 +31,13 @@ const Layout = ({isMenuOpen, setIsMenuOpen}) => {
       .then(() => {
         user.setColaboradores(null);
         user.setUser(null);
+        localStorage.removeItem('token');
         navigate('/');
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error('Error during logout:', err);
+        navigate('/');
+      });
   };
 
   const toggleMenu = () => {

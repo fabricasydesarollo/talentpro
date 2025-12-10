@@ -22,8 +22,8 @@ const ProtectedLayout = ({ allowedProfiles }) => {
         let res;
         try {
           res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
-        } catch (err) {
-          const token = localStorage.getItem("token");
+        } catch (error) {
+          const token = localStorage.getItem("token")
           if (token) {
             res = await axios.get(`${URLBASE}/usuarios/sesion`, {
               headers: {
@@ -31,7 +31,9 @@ const ProtectedLayout = ({ allowedProfiles }) => {
               },
             });
           } else {
-            throw err;
+            toast.error("Sesión no válida. Redirigiendo...");
+            navigate("/");
+            return;
           }
         }
 
