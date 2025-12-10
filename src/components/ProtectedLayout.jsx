@@ -4,7 +4,6 @@ import Layout from './Layout';
 import { Outlet } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
-// import { URLBASE } from '../lib/actions.js';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { URLBASE } from '../lib/actions.js';
@@ -20,20 +19,48 @@ const ProtectedLayout = ({ allowedProfiles }) => {
       const toastId = toast.loading("Verificando sesión...", { toastId: "loading-id" });
 
       try {
-        const res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
+        let res;
+        try {
+          res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
+        } catch (err) {
+          const token = localStorage.getItem("token");
+          if (token) {
+            res = await axios.get(`${URLBASE}/usuarios/sesion`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+          } else {
+            throw err;
+          }
+        }
 
-
-        if (!res.data?.data) {
-          toast.update(toastId, { render: "Sesión no válida. Redirigiendo...", type: "error", isLoading: false, autoClose: 3000 });
-          navigate('/');
+        if (!res?.data?.data) {
+          toast.update(toastId, {
+            render: "Sesión no válida. Redirigiendo...",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          });
+          navigate("/");
           return;
         } else {
-          navigate('/home');
-          toast.update(toastId, { render: "Sesión válida. Redirigiendo...", type: "success", isLoading: false, autoClose: 3000 });
+          navigate("/home");
+          toast.update(toastId, {
+            render: "Sesión válida. Redirigiendo...",
+            type: "success",
+            isLoading: false,
+            autoClose: 3000,
+          });
         }
       } catch {
-        toast.update(toastId, { render: "Error al verificar la sesión", type: "error", isLoading: false, autoClose: 3000 });
-        navigate('/');
+        toast.update(toastId, {
+          render: "Error al verificar la sesión",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+        navigate("/");
       } finally {
         setLoadingSession(false);
       }

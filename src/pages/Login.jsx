@@ -21,6 +21,7 @@ const Login = () => {
       const result = await axios.post(`${URLBASE}/usuarios/login`, { documento: documento, contrasena: password }, { withCredentials: true })
       if (result.data?.data) {
         user?.setUser(result.data?.data)
+        localStorage.setItem('token', result.data?.token);
         toast.success("Credenciales correctas!")
 
         if (result.data?.data.Empresas.length < 1) {
