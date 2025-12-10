@@ -32,7 +32,9 @@ const ProtectedLayout = ({ allowedProfiles }) => {
             });
           } else {
             toast.error("Sesión no válida. Redirigiendo...");
-            navigate("/");
+            if (location.pathname === "/") {
+              navigate("/");
+            }
             return;
           }
         }
@@ -44,10 +46,16 @@ const ProtectedLayout = ({ allowedProfiles }) => {
             isLoading: false,
             autoClose: 3000,
           });
-          navigate("/");
+          if (location.pathname === "/") {
+              return;
+            }else {
+              navigate("/");
+            }
           return;
         } else {
-          navigate("/home");
+          if (location.pathname === "/") {
+            navigate("/home");
+          }
           toast.update(toastId, {
             render: "Sesión válida. Redirigiendo...",
             type: "success",
