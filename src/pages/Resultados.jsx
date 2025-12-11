@@ -68,7 +68,7 @@ const Resultados = () => {
     )
   }
 
-  const dateRegister = respuestas?.compromisos?.filter(({ TipoEvaluacione }) => TipoEvaluacione.nombre === "EVALUACIÓN")
+  const dateRegister = respuestas?.compromisos?.filter(({ TipoEvaluacione }) => TipoEvaluacione?.nombre === "EVALUACIÓN")
     .map(({ createdAt }) => createdAt)[0];
 
   const calcularPromedio = (competencias) => {
@@ -100,9 +100,9 @@ const Resultados = () => {
         <thead className=''>
           <tr className='grid border grid-cols-3 font-semibold justify-items-center items-center'>
             <th className='row-span-2'>
-              <img className=' w-32 p-1 h-auto' src={usuario.Empresas[0].urlLogo} alt={`logo-empresa-${usuario.Empresas[0].nombre}`} />
+              <img className=' w-32 p-1 h-auto' src={usuario?.Empresas[0]?.urlLogo} alt={`logo-empresa-${usuario?.Empresas[0]?.nombre}`} />
             </th>
-            <th className='border-b py-2'>{evaluacion.nombre}</th>
+            <th className='border-b py-2'>{evaluacion?.nombre}</th>
             <th className='border-l px-4 row-span-2'>{`Versión: ${1}`}</th>
             <th>PROCESO: GESTIÓN HUMANA</th>
           </tr>
@@ -124,7 +124,7 @@ const Resultados = () => {
             <th className='col-span-2 text-start border-b'>Objetivo</th>
             <td className='col-span-2 pb-2'>El objetivo de esta evaluación es valorar las competencias para identificar las fortalezas y puntos de mejora en cuanto al desempeño esperado.</td>
           </tr>
-          <tr className='grid grid-cols-4 mt-4 p-1 mb-4'>
+          <tr className='grid grid-cols-4 mt-4 p-1 mb-4' key={Math.random()} >
             <th className='col-span-4 border font-bold my-3'>Escala de calificación</th>
             {
               calificaciones?.map((calificacion) => (
@@ -168,8 +168,8 @@ const Resultados = () => {
           <tr className='grid grid-cols-2 border justify-items-center border-collapse gap-3'>
             <th>Nombre y cédula evaluador</th>
             <th>Nombre y cédula evaluado</th>
-            <td>{`${respuestas?.evaluador.map(ev => `${ev.nombre.toUpperCase()} - ${ev.idUsuario}`).join(', ')}`}</td>
-            <td>{`${usuario.nombre.toUpperCase()} - ${usuario.idUsuario}`}</td>
+            <td>{`${respuestas?.evaluador.map(ev => `${ev?.nombre.toUpperCase()} - ${ev?.idUsuario}`).join(', ')}`}</td>
+            <td>{`${usuario?.nombre.toUpperCase()} - ${usuario?.idUsuario}`}</td>
           </tr>
         </tbody>
         <tfoot className='border grid grid-cols-2 my-4'>

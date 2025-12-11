@@ -24,6 +24,7 @@ const ProtectedLayout = ({ allowedProfiles }) => {
           res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
         } catch (error) {
           const token = localStorage.getItem("token")
+          console.log(token)
           if (token) {
             res = await axios.get(`${URLBASE}/usuarios/sesion`, {
               headers: {
@@ -31,10 +32,13 @@ const ProtectedLayout = ({ allowedProfiles }) => {
               },
             });
           } else {
-            toast.error("Sesión no válida. Redirigiendo...");
-            if (location.pathname === "/") {
-              navigate("/");
-            }
+            toast.update(toastId, {
+              render: "Sesión no válida. Redirigiendo...",
+              type: "error",
+              isLoading: false,
+              autoClose: 3000,
+            });
+            navigate("/");
             return;
           }
         }
@@ -46,18 +50,11 @@ const ProtectedLayout = ({ allowedProfiles }) => {
             isLoading: false,
             autoClose: 3000,
           });
-          if (location.pathname === "/") {
-              return;
-            }else {
-              navigate("/");
-            }
+          navigate("/");
           return;
         } else {
-          if (location.pathname === "/") {
-            navigate("/home");
-          }
           toast.update(toastId, {
-            render: "Sesión válida. Redirigiendo...",
+            render: "Sesión válida",
             type: "success",
             isLoading: false,
             autoClose: 3000,
@@ -78,7 +75,7 @@ const ProtectedLayout = ({ allowedProfiles }) => {
 
     verifySession();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.user]);
+  }, [user?.user, navigate]);
 
   useEffect(() => {
     if (!loadingSession) {
