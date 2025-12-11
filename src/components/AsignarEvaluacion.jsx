@@ -149,6 +149,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
       });
   }
 
+
   return (
     <div className="fixed bg-black inset-0 bg-opacity-50 flex justify-center items-center overflow-auto">
       <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-screen overflow-y-auto relative">
@@ -208,78 +209,86 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                 <th scope="col" className="px-4 py-2 text-center">Autoevaluación</th>
               </tr>
             </thead>
-            <tbody className="text-gray-500">
-              {
-                paginatedData?.map((user, idx) => (
-                  <tr className="border-t" key={idx}>
-                    <td className="px-4 py-2">{user.idUsuario}</td>
-                    <td className="px-4 py-2">{user.nombre}</td>
-                    <td className="px-4 py-2">{user.empresa || '-'}</td>
-                    <td className="px-4 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        name="evaluacion"
-                        checked={user?.evaluacion}
-                        onChange={(e) => {
-                          setUsuariosFiltrados(prev =>
-                            prev.map(u =>
-                              u.idUsuario === user.idUsuario ? { ...u, evaluacion: e.target.checked } : u
-                            )
-                          );
-                        }}
-                        className="rounded-md border-gray-400"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        name="autoevaluacion"
-                        checked={user?.autoevaluacion}
-                        onChange={(e) => {
-                          setUsuariosFiltrados(prev =>
-                            prev.map(u =>
-                              u.idUsuario === user.idUsuario ? { ...u, autoevaluacion: e.target.checked } : u
-                            )
-                          );
-                        }}
-                        className="rounded-md border-gray-400"
-                      />
-                    </td>
-                  </tr>
-                ))
-              }
-            </tbody>
+            {
+              usuariosFiltrados.length > 0 ? (
+                <tbody className="text-gray-500">
+                  {
+                    paginatedData?.map((user, idx) => (
+                      <tr className="border-t" key={idx}>
+                        <td className="px-4 py-2">{user.idUsuario}</td>
+                        <td className="px-4 py-2">{user.nombre}</td>
+                        <td className="px-4 py-2">{user.empresa || '-'}</td>
+                        <td className="px-4 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            name="evaluacion"
+                            checked={user?.evaluacion}
+                            onChange={(e) => {
+                              setUsuariosFiltrados(prev =>
+                                prev.map(u =>
+                                  u.idUsuario === user.idUsuario ? { ...u, evaluacion: e.target.checked } : u
+                                )
+                              );
+                            }}
+                            className="rounded-md border-gray-400"
+                          />
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            name="autoevaluacion"
+                            checked={user?.autoevaluacion}
+                            onChange={(e) => {
+                              setUsuariosFiltrados(prev =>
+                                prev.map(u =>
+                                  u.idUsuario === user.idUsuario ? { ...u, autoevaluacion: e.target.checked } : u
+                                )
+                              );
+                            }}
+                            className="rounded-md border-gray-400"
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              ) : (
+                <div className="w-full h-full flex justify-center items-center bg-white absolute bottom-0 left-0">
+                  <p className="text-center p-4 text-gray-500 text-2xl">Cargando datos, por favor espere...</p>
+                </div>
+              )
+            }
           </table>
           {totalPages >= 1 && (
-            <div className="flex justify-center items-center p-4 gap-4 border-t border-gray-200 flex-wrap">
-              <button
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                <IoChevronBackSharp />
-              </button>
-              <span className="text-sm text-gray-600">
-                {currentPage} de {totalPages}
-              </span>
-              <button
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                <IoChevronForwardSharp />
-              </button>
-              <select id="pageSize" className="border border-gray-300 rounded-lg cursor-pointer text-sm pr-6  text-gray-600 focus:outline-none focus:ring-1 focus:ring-zcinza focus:border-zcinza px-3 py-2"
-                onChange={(e) => {
-                  setCurrentPage(1);
-                  setPageSize(Number(e.target.value));
-                }} value={pageSize}>
-                <option value="15">15</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-          )}
+                  <div className="flex justify-center items-center p-4 gap-4 border-t border-gray-200 flex-wrap">
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                      <IoChevronBackSharp />
+                    </button>
+                    <span className="text-sm text-gray-600">
+                      {currentPage} de {totalPages}
+                    </span>
+                    <button
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      <IoChevronForwardSharp />
+                    </button>
+                      <select id="pageSize" className="border border-gray-300 rounded-lg cursor-pointer text-sm pr-6  text-gray-600 focus:outline-none focus:ring-1 focus:ring-zcinza focus:border-zcinza px-3 py-2" 
+                        onChange={(e) => {
+                        setCurrentPage(1);
+                        setPageSize(Number(e.target.value));
+                      }} value={pageSize}>
+                        <option value="15">15</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                      </select>
+                  </div>
+                )}
         </div>
       </div>
     </div>

@@ -57,44 +57,56 @@ const AdmEvaluacion = () => {
 
   const selcEmpresas = []
 
+  const [openEval, setOpenEval] = useState(false)
 
   return (
     <div className="flex flex-col mx-auto text-sm w-full px-36 justify-center items-center relative">
-      <h1 className="text-zvioleta text-2xl font-bold my-2">Administrar evaluaciones</h1>
-      <form className="flex gap-5 w-full justify-between" onSubmit={handleSubmit(createEvaluacion)}>
-        <div className="w-full">
-          <label htmlFor="" className="text-gray-700">Nombre</label>
-          <input className="input-custom" type="text" {...register("nombre")} />
-        </div>
-        <div className="w-1/2">
-          <label htmlFor="" className="text-gray-700">Año</label>
-          <input className="input-custom" type="number" {...register("year")} />
-        </div>
-        <div className="w-1/2">
-          <label htmlFor="" className="text-gray-700">Fecha Inicio</label>
-          <input className="input-custom" type="date" {...register("fechaInicio")} />
-        </div>
-        <div className="w-1/2">
-          <label htmlFor="" className="text-gray-700">Fecha Fin</label>
-          <input className="input-custom" type="date" {...register("fechaFin")} />
-        </div>
-        <div className="w-1/2">
-          <label htmlFor="" className="text-gray-700">Objetivo</label>
-          <input className="input-custom" type="text" {...register("fechaFin")} />
-        </div>
-        <div className="flex justify-center flex-col items-center">
-          <label htmlFor="activo" className="text-gray-700">¿Activo?</label>
-          <input className="border p-2 rounded-lg" type="checkbox" defaultChecked={true} {...register("estado")} />
-        </div>
-        <div className="flex justify-center flex-col items-center pl-10">
-          <button className="bg-zvioleta text-white hover:bg-zvioleta/90 hover:scale-105 px-4 py-2 rounded-md">Guardar</button>
-        </div>
-      </form>
+      <h1 className="text-zvioleta text-4xl font-bold my-6">Administrar evaluaciones</h1>
+      <button className="bg-zvioleta text-white px-4 py-2 rounded-md" onClick={() => setOpenEval(!openEval)}>Crear Evaluación</button>
+      {
+        openEval && (
+          <div className="fixed bg-black inset-0 bg-opacity-50 flex justify-center items-center overflow-auto">
+            <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto relative">
+              <h2 className="text-2xl font-semibold text-zvioleta mb-4">Crear nueva evaluación</h2>
+              <button onClick={() => setOpenEval(false)} className="absolute top-2 right-2 text-zvioleta text-2xl font-bold">&times;</button>
+              <form className="grid gap-5 w-full justify-between grid-cols-3" onSubmit={handleSubmit(createEvaluacion)}>
+                <div className="w-full col-span-2">
+                  <label htmlFor="nombre" className="text-gray-700">Nombre</label>
+                  <input className="input-custom" type="text" id="nombre" {...register("nombre")} />
+                </div>
+                <div className="w-full">
+                  <label htmlFor="year" className="text-gray-700">Año</label>
+                  <input className="input-custom" type="number" id="year" {...register("year")} />
+                </div>
+                <div className="w-full">
+                  <label htmlFor="fechaInicio" className="text-gray-700">Fecha Inicio</label>
+                  <input className="input-custom" type="date" id="fechaInicio" {...register("fechaInicio")} />
+                </div>
+                <div className="w-full">
+                  <label htmlFor="fechaFin" className="text-gray-700">Fecha Fin</label>
+                  <input className="input-custom" type="date" id="fechaFin" {...register("fechaFin")} />
+                </div>
+                <div className="flex justify-center flex-col items-center">
+                  <label htmlFor="activo" className="text-gray-700">¿Activo?</label>
+                  <input className="border p-2 rounded-lg" type="checkbox" defaultChecked={true} {...register("estado")} />
+                </div>
+                <div className="w-full col-span-3">
+                  <label htmlFor="objetivo" className="text-gray-700">Objetivo</label>
+                  <input className="input-custom" type="text" id="objetivo" {...register("objetivo")} />
+                </div>
+                <div className="flex justify-center flex-col items-center pl-10 col-span-3">
+                  <button className="bg-zvioleta text-white hover:bg-zvioleta/90 hover:scale-105 px-4 py-2 rounded-md">Guardar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      }
       <div className="w-full gap-4 mt-5 border-b border-gray-300">
         {evaluaciones.map(evaluacion => (
           <div key={evaluacion.idEvaluacion} className={`${currentEval.idEvaluacion == evaluacion.idEvaluacion ? 'bg-zvioleta text-white rounded-md' : ''} flex justify-between items-center`} >
             <p onClick={() => setCurrentEval(evaluacion)} className='border-b border-gray-200 p-2'>{`${evaluacion.nombre} ${evaluacion.year}`}</p>
-            <button className="bg-znaranja rounded-md p-1" onClick={() => setShowAsignar(true)}>Asignar Usuarios</button>          
+            <button className="bg-znaranja rounded-md p-1" onClick={() => setShowAsignar(true)}>Asignar Usuarios</button>
           </div>
         ))}
         <form className="flex items-center justify-center gap-4">
