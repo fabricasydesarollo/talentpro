@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
@@ -38,9 +38,9 @@ const Resultados = () => {
   }, [idUsuario, user?.user?.idUsuario]);
 
   const formatearFecha = (fecha) => {
-    if (!fecha) return 0;
+    if (!fecha) return '--/--/----';
     const date = new Date(fecha);
-    if (isNaN(date.getTime())) return 0; // Verifica si la fecha es válida
+    if (isNaN(date.getTime())) return '--/--/----'; // Verifica si la fecha es válida
     const opciones = {
       year: 'numeric',
       month: '2-digit',
@@ -54,16 +54,16 @@ const Resultados = () => {
   if (respuestas.evaluacion?.length === 0 && respuestas.autoevaluacion?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen w-full text-center">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Sin resultados disponibles</h2>
-          <p className="text-gray-600 mb-6">
-            Aún no se han registrado resultados para la evaluación de <span className="font-medium text-znaranja">{usuario?.nombre}</span>.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="px-6 py-2 bg-zvioleta text-white rounded-lg shadow-md hover:bg-zvioleta/90 transition"
-          >
-            Volver
-          </button>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Sin resultados disponibles</h2>
+        <p className="text-gray-600 mb-6">
+          Aún no se han registrado resultados para la evaluación de <span className="font-medium text-znaranja">{usuario?.nombre}</span>.
+        </p>
+        <button
+          onClick={() => navigate(-1)}
+          className="px-6 py-2 bg-zvioleta text-white rounded-lg shadow-md hover:bg-zvioleta/90 transition"
+        >
+          Volver
+        </button>
       </div>
     )
   }
@@ -86,7 +86,8 @@ const Resultados = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md max-w-7xl my-2 mx-auto print:shadow-none">
-      <h1 className="text-2xl font-bold mb-6 text-zvioleta text-center my-5 print:hidden">{`Resultados de evaluación ${usuario?.nombre}`}</h1>
+      <h1 className="text-3xl font-bold text-zvioleta text-center my-5 print:hidden">DETALLE DE EVALUACIÓN</h1>
+      <p className='text-base text-center text-znaranja mb-4 print:hidden'>{usuario?.nombre}</p>
       <div className='w-full flex justify-end'>
         <button
           onClick={() => window.print()}
@@ -128,10 +129,10 @@ const Resultados = () => {
             <th className='col-span-4 border font-bold my-3'>Escala de calificación</th>
             {
               calificaciones?.map((calificacion) => (
-                <>
-                  <td className='col-span-3 p-1 border' key={calificacion.descripcion}>{calificacion.descripcion}</td>
-                  <td className='text-center border' key={calificacion.valor}>{calificacion.valor}</td>
-                </>
+                <React.Fragment key={calificacion.valor}>
+                  <td className='col-span-3 p-1 border'>{calificacion.descripcion}</td>
+                  <td className='text-center border'>{calificacion.valor}</td>
+                </React.Fragment>
               ))
             }
           </tr>
@@ -161,9 +162,10 @@ const Resultados = () => {
           </tr>
           <tr className='grid grid-cols-1 border'>
             <th className='text-start'>Comentarios</th>
-            {respuestas?.compromisos?.map(({ index, _ }) => (
+            {/* {respuestas?.compromisos?.map(({ index, _ }) => (
               <td key={index} className='border'>*</td>
-            ))}
+            ))} */}
+            <td className='border-t-2'>*</td>
           </tr>
           <tr className='grid grid-cols-2 border justify-items-center border-collapse gap-3'>
             <th>Nombre y cédula evaluador</th>
