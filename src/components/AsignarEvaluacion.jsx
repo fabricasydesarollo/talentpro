@@ -52,6 +52,8 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     setUsuariosFiltrados(usuariosNormalizados);
   }, [usuarios, evaluaciones]);
 
+  console.log(usuariosFiltrados.length)
+
   function filtrarUsuariosEmpresas(idEmpresa) {
     if (idEmpresa === '') {
       setUsuariosFiltrados(usuariosNormalizados);
