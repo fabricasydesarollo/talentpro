@@ -210,7 +210,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
               </tr>
             </thead>
             {
-              usuariosNormalizados.length > 0 ? (
+              usuarios.length > 0 && evaluaciones.length > 0 ? (
                 <tbody className="text-gray-500">
                   {
                     paginatedData?.map((user, idx) => (
