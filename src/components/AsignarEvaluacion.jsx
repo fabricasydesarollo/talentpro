@@ -52,7 +52,6 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     setUsuariosFiltrados(usuariosNormalizados);
   }, [usuarios, evaluaciones]);
 
-  console.log(usuariosFiltrados.length)
 
   function filtrarUsuariosEmpresas(idEmpresa) {
     if (idEmpresa === '') {
@@ -68,10 +67,16 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     if (nombre === '') {
       setUsuariosFiltrados(usuariosNormalizados);
     } else {
-      console.log(nombre)
       const filtrados = usuariosFiltrados.filter(user =>
         user.nombre.toLowerCase().includes(nombre.toLowerCase())
       );
+      if (filtrados.length === 0) {
+        const filtroDocumento = usuariosNormalizados.filter(user =>
+          user.idUsuario.toString().includes(nombre)
+        );
+        setUsuariosFiltrados(filtroDocumento);
+        return;
+      }
       setUsuariosFiltrados(filtrados);
     }
   }
@@ -205,7 +210,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
               </tr>
             </thead>
             {
-              usuariosFiltrados.length > 0 ? (
+              usuariosNormalizados.length > 0 ? (
                 <tbody className="text-gray-500">
                   {
                     paginatedData?.map((user, idx) => (
