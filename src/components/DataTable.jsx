@@ -33,7 +33,7 @@ const DataTable = ({
   // 💾 Exportar a Excel sin usar xlsx
   const handleExportExcel = () => {
 
-    axios.post(`${URLBASE}/informes/exportExcel`, { reporteNombre: title, columns, datos: filteredData }, {
+    axios.post(`${URLBASE}/informes/exportExcel`, { reporteNombre: title, columns, datos: filteredData }, {withCredentials: true}, {
       responseType: "blob",
     }).then((response) => {
       const url = window.URL.createObjectURL(new Blob([response.data]));

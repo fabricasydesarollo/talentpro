@@ -63,11 +63,8 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador, esEvalu
       (competencias.length === 0) || (competencias.length > 0 && accionesMejoramiento.length >= 1)
     );
 
-    console.log("¿Puede enviar?", pass);
-
     const puedeEnviar = comentariosGenerales.length > 0 && (!esEvaluador || pass);
 
-    console.log(puedeEnviar)
     if (puedeEnviar) {
       try {
         // Guardar comentarios generales

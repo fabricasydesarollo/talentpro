@@ -11,7 +11,7 @@ const normalizeList = (list) => {
             ...item,
             id: item.idEmpresa || item.idSede || item.idUsuario, // Asignar `id` genérico
             tipo: item.idEmpresa ? 'empresa' : item.idSede ? 'sede' : 'usuario', // Asignar el tipo
-            uniqueKey: `${item.id}-${item.tipo}-${index}`, // Generar clave única con `id`, tipo e índice
+            uniqueKey: `${item.idUsuario}-${index}`, // Generar clave única con `id`, tipo e índice
         }));
 };
 
@@ -26,6 +26,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     const [selectedAsignados, setSelectedAsignados] = useState([]);
     const [evaluaciones, setEvaluaciones] = useState([])
     const [idEvaluacion, setIdEvaluacion] = useState(0)
+    const [error, setError] = useState(null);
 
 
     useEffect(() => {
@@ -45,7 +46,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
         if (showModal && disponibles && asignados) {
             setAsignadosList(normalizeList(asignados?.filter(user => user?.idEvaluacion == idEvaluacion)));
             setDisponiblesList(normalizeList(disponibles).filter(
-                (item) => !normalizeList(asignados).some((a) => a.id === item.id)
+                (item) => !normalizeList(asignados).some((a) => a.id === item.id && a.idEvaluacion === idEvaluacion)
             ));
             setSelectedDisponibles([]);
             setSelectedAsignados([]);
@@ -88,6 +89,10 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     };
 
     const handleSave = () => {
+        if (idEvaluacion === 0) {
+            setError('Por favor selecciona una evaluación antes de guardar.');
+            return;
+        }
         const colaboradoresAsignados = asignadosList.map((item) => ({
             idUsuario: item.idUsuario || item.idEmpresa || item.idSede,
             id: item.id,
@@ -95,6 +100,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
             idEvaluacion: item.idEvaluacion
         }));
 
+        
         const usuariosAsignados = (colaboradoresAsignados?.length > 0 ?
             colaboradoresAsignados.map(asignados => ({
                 idEvaluador: idUsuario,
@@ -108,11 +114,16 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
 
         axios.post(`${URLBASE}/usuarios/colaboradores`, {usuarios: usuariosAsignados})
         .then(res => toast.success(res.data.message, {toastId: "toast-id-ok"}))
-        .catch(() => toast.error("No fue posible asignar los colaboradors!", {toastId: "idToast-err"}))
-
+        .catch(() => toast.error("No fue posible asignar los colaboradores!", {toastId: "idToast-err", position: 'top-center', theme: 'colored'}));
+        
         onChange(colaboradoresAsignados);
         onClose();
     };
+
+    if(error){
+        toast.error(error, { toastId: 'modal-error-id', autoClose: 3000, position: 'top-center', theme: 'colored' });
+        setError(null);
+    }
 
     if (!showModal) return null;
 
@@ -120,25 +131,28 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
                 <h2 className="text-2xl font-bold mb-4 text-znaranja">{`Asignar ${type}`}</h2>
-                <div className="flex flex-col">
+                <div className="flex flex-col mb-4">
                     <label htmlFor="id-evaluacion">Seleccione una Evaluación</label>
                     <select
                         value={idEvaluacion}
                         onChange={(e) => setIdEvaluacion(Number(e.target.value))}
-                        className="w-full border-gray-300 rounded-md" name="evaluacion" id="id-evaluacion" >
+                        className={`${idEvaluacion === 0 ? 'border-red-500 border-2' : 'border-gray-300'} w-full rounded-md focus:ring-2 focus:ring-offset-1 focus:ring-zvioleta focus:outline-none focus:border-transparent`} name="evaluacion" id="id-evaluacion" >
                         <option value="0" selected>Seleccione...</option>
                         {evaluaciones.map((evaluacion, index) => (
                             <option key={index} value={evaluacion.idEvaluacion}>{`${evaluacion.nombre} ${evaluacion.year}`}</option>
                         ))}
                     </select>
-                    <p className='text-znaranja py-2'>** Asegurate que la evaluación seleccionada es la correcta **</p>
                 </div>
+                    {
+                        idEvaluacion === 0 && <p className="text-red-500 text-sm mt-1 mb-4">* Debes seleccionar una evaluación antes de guardar.</p>
+                    }
+                    <p className='text-znaranja text-sm mt-1 mb-4'>** Asegurate que la evaluación seleccionada es la correcta **</p>
                 <input
                     type="text"
                     placeholder="Buscar por documento o nombre..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full mb-4 p-2 border rounded border-gray-300"
+                    className="w-full mb-4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-offset-1 focus:ring-zvioleta focus:outline-none focus:border-transparent"
                 />
                 <div className="flex gap-4">
                     <div className="w-1/2">
@@ -150,7 +164,11 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                                         type="checkbox"
                                         checked={selectedDisponibles.includes(item.id)}
                                         onChange={() => toggleSelection(item.id, true)}
-                                        className="mr-2"
+                                        className="mr-2 h-4 w-4
+                                                border border-znaranja rounded-md
+                                                checked:bg-znaranja checked:border-znaranja 
+                                                focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-znaranja
+                                                cursor-pointer"
                                     />
                                     <span>{`${item.id} - ${item.nombre}`}</span>
                                 </li>
@@ -174,7 +192,11 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                                         type="checkbox"
                                         checked={selectedAsignados.includes(item.id)}
                                         onChange={() => toggleSelection(item.id, false)}
-                                        className="mr-2"
+                                        className="mr-2 h-4 w-4
+                                                border border-znaranja rounded-md
+                                                checked:bg-znaranja checked:border-znaranja 
+                                                focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-znaranja
+                                                cursor-pointer"
                                     />
                                     <span>{`${item.id} - ${item.nombre}`}</span>
                                 </li>
@@ -194,7 +216,8 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                     <button onClick={onClose} className="bg-znaranja text-white px-4 py-2 rounded-lg">
                         Cancelar
                     </button>
-                    <button onClick={handleSave} className="bg-zvioleta text-white px-4 py-2 rounded-lg">
+                    <button type='button' 
+                        onClick={handleSave} className="bg-zvioleta text-white px-4 py-2 rounded-lg">
                         Guardar
                     </button>
                 </div>

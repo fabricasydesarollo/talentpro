@@ -236,6 +236,9 @@ const fechas = {
               <p className="text-sm text-gray-600 mb-6">
                 Esta acción enviará la evaluación y no podrá modificarse después.
               </p>
+              <p className='text-zvioleta border-l-4 rounded-md border-zvioletaopaco pl-2 py-2 mb-4 text-sm'>
+                <strong>Recordatorio:</strong> Deja tus comentarios después de enviar la evaluación.
+              </p>
               <div className="flex justify-end gap-3">
                 <button
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
