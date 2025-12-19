@@ -24,7 +24,6 @@ const ProtectedLayout = ({ allowedProfiles }) => {
           res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
         } catch (error) {
           const token = localStorage.getItem("token")
-          console.log(token)
           if (token) {
             res = await axios.get(`${URLBASE}/usuarios/sesion`, {
               headers: {
@@ -57,7 +56,8 @@ const ProtectedLayout = ({ allowedProfiles }) => {
             render: "Sesión válida",
             type: "success",
             isLoading: false,
-            autoClose: 3000,
+            position: "top-right",
+            autoClose: 1000,
           });
         }
       } catch {

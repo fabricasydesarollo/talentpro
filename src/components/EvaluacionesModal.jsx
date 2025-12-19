@@ -15,8 +15,6 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
     setIsModalOpen(!isModalOpen);
   };
 
-  console.log(evaluaciones)
-
 
   const handleDelete = async (idEvaluacion, idEvaluador, idTipoEvaluacion) => {
     try {
@@ -75,20 +73,20 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
             >
               <div>
                 <p>
-                  <strong>Evaluación:</strong> {`${evaluacion?.evaluacion.nombre} - ${evaluacion?.evaluacion.year}`}
+                  <strong>Evaluación:</strong> {`${evaluacion?.evaluacionNombre} - ${evaluacion?.year}`}
                 </p>
                 <p>
-                  <strong>Tipo:</strong> {evaluacion?.TipoEvaluacione?.nombre}
+                  <strong>Tipo:</strong> {evaluacion?.tipoEvaluacion}
                 </p>
                 <p>
-                  <strong>Evaluador:</strong> {`${evaluacion?.evaluador.nombre} - ${evaluacion?.idEvaluador}`}
+                  <strong>Evaluador:</strong> {`${evaluacion?.evaluadorNombre} - ${evaluacion?.idEvaluador}`}
                 </p>
                 <p>
                   <strong>Fecha de registro:</strong> {`${evaluacion.createdAt.split('T')[0]}`}
                 </p>
               </div>
               <button
-                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador, evaluacion.TipoEvaluacione?.idTipoEvaluacion)}
+                onClick={() => handleDelete(evaluacion.idEvaluacion, evaluacion.idEvaluador, evaluacion.idTipoEvaluacion)}
                 className="bg-znaranja text-white px-3 py-1 rounded-lg hover:scale-105 hover:bg-znaranja/80 disabled:bg-znaranja/70 disabled:cursor-not-allowed"
                 disabled={isDisabledAfterDays(evaluacion.createdAt, 6)}
               >

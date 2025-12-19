@@ -31,11 +31,19 @@ const Home = () => {
                 });
 
                 if (respuesta.status === 200) {
-                    if (respuesta.data.porcentageEvaluados < 99) {
-                        toast.info(`Llevas el ${respuesta.data.porcentageEvaluados.toFixed()}% de evaluaciones completadas.`, { position: "top-right", toastId: "percentage-id", autoClose: 10000 })
-                    } else {
-                        toast.success(`Evaluaciones completadas al ${respuesta.data.porcentageEvaluados.toFixed()}%`, {toastId: 'total_id'})
-                    }
+                    if (respuesta.data?.disponible) {
+            
+                        const {total, completados} = respuesta.data.disponible[0];
+                        const attempt = evaluacion ? evaluacion.UsuariosEvaluaciones.attempt : 0;
+                        const sumaCompletados = Number(completados) + Number(attempt);
+                        const sumaTotal = Number(total) + 1;
+                        const porcentage = (sumaCompletados / sumaTotal) * 100;
+                        if (porcentage < 100) {
+                            toast.info(`Llevas el ${porcentage.toFixed()}% de evaluaciones completadas.`, { position: "top-right", toastId: "percentage-id", autoClose: 10000 })
+                        }else{
+                            toast.success(`Evaluaciones completadas al ${porcentage.toFixed()}%`, {toastId: 'total_id'})
+                        }
+                    } 
                 } else {
                     toast.error("Error al obtener la disponibilidad.");
                 }

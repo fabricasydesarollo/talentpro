@@ -5,7 +5,7 @@ import { BarChartPromedio, LineChartPromedio, PieChartCumplimiento } from "../pa
 import { Card } from "antd";
 import Loading from "./Loading";
 import { useUser } from "../context/UserContext";
-import { desviacionEstandar } from "../lib/utils";
+import { desviacionEstandar, filtrarSedes } from "../lib/utils";
 import { toast } from "react-toastify";
 
 const DashboardUI = () => {
@@ -16,12 +16,13 @@ const DashboardUI = () => {
   const [empresas, setEmpresas] = useState({})
   const [isLoading, setIsLoading] = useState(true); // Estado para cargar datos
   const [evaluaciones, setEvaluaciones] = useState([])
+  const [sedes, setsedes] = useState([])
   const [infoSelect, setInfoSelect] = useState([])
   const idEvaluacion = useRef(null)
   const idNivelCargo = useRef(null)
   const area = useRef(null)
   const idSede = useRef(null)
-  const idEmpresa = useRef(null)
+  const [idEmpresa, setIdEmpresa] = useState(null)
 
   const user = useUser()
 
@@ -96,9 +97,9 @@ const DashboardUI = () => {
       setIsLoading(true)
       const [competenciasRes, cubrimientoRes] = await Promise.all([
         axios.get(`${URLBASE}/informes/resultados`, {
-          params: { idEmpresa: idEmpresa.current.value, idEvaluacion: idEvaluacion.current.value, idNivelCargo: idNivelCargo.current.value, area: area.current.value, idSede: idSede.current.value },
+          params: { idEmpresa: idEmpresa, idEvaluacion: idEvaluacion.current.value, idNivelCargo: idNivelCargo.current.value, area: area.current.value, idSede: idSede.current.value },
         }),
-        axios.get(`${URLBASE}/informes/grafica/all`, { params: { idEmpresa: idEmpresa.current.value, idEvaluacion: idEvaluacion.current.value, idNivelCargo: idNivelCargo.current.value, area: area.current.value, idSede: idSede.current.value } }),
+        axios.get(`${URLBASE}/informes/grafica/all`, { params: { idEmpresa: idEmpresa, idEvaluacion: idEvaluacion.current.value, idNivelCargo: idNivelCargo.current.value, area: area.current.value, idSede: idSede.current.value } }),
       ])
       setCubrimiento(cubrimientoRes.data?.data || [])
       setCompetencias(competenciasRes.data?.data || []);
@@ -139,14 +140,14 @@ const DashboardUI = () => {
   }, [competencias]);
 
 
-
   const empresasOrdenadas = useMemo(() => {
     return empresas?.Empresas?.sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [empresas])
 
-  const sedesOrdenadas = useMemo(() => {
-    return empresas?.Sedes?.sort((a, b) => a.nombre.localeCompare(b.nombre))
-  }, [empresas])
+  
+  useEffect(() => {
+    setsedes(filtrarSedes(empresas, idEmpresa));
+  }, [idEmpresa, empresas]);
 
   return (
     <>
@@ -167,7 +168,9 @@ const DashboardUI = () => {
           </div>
           <div className="flex flex-col">
             <label htmlFor="id-empresa">Empresa</label>
-            <select ref={idEmpresa} className="w-10/12 border-gray-300 rounded-md" name="evaluacion" id="id-empresa" >
+            <select className="w-10/12 border-gray-300 rounded-md" name="evaluacion" id="id-empresa" 
+            value={idEmpresa}
+            onChange={(e) => setIdEmpresa(e.target.value)}>
               <option selected value="">Seleccione...</option>
               {empresasOrdenadas?.map((empresa, index) => (
                 <option key={index} value={empresa.idEmpresa}>{empresa.nombre}</option>
@@ -178,7 +181,7 @@ const DashboardUI = () => {
             <label htmlFor="id-sede">Sede</label>
             <select ref={idSede} className={`border-gray-300 rounded-md w-10/12`} name="evaluacion" id="id-sede" >
               <option selected value="">Seleccione...</option>
-              {sedesOrdenadas?.map((sede, index) => (
+              {sedes?.map((sede, index) => (
                 <option key={index} value={sede.idSede}>{sede.nombre}</option>
               ))}
             </select>

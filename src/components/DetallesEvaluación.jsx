@@ -50,6 +50,8 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
     return <Loading />
 }
 
+console.log(usuario)
+
 
     return (
         <div className="col-span-3 border border-white/20 rounded-2xl p-6 bg-white/5 shadow-lg">
@@ -89,14 +91,14 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                 </span>
                             </p>
                             <p className="text-sm text-gray-400 flex items-center">Completado:
-                                    {evaluacion.UsuariosEvaluaciones.attempt >= evaluacion.UsuariosEvaluaciones.maxAttempts ? <MdCheck size={20} color="green" /> : <MdClose size={20} color="red" /> }
+                                    {(!colaborador ? evaluacion.UsuariosEvaluaciones.attempt >= evaluacion.UsuariosEvaluaciones.maxAttempts : usuario.usuariosEvaluadores.completado) ? <MdCheck size={20} color="green" /> : <MdClose size={20} color="red" /> }
                             </p>
                         </div>
                         <div className="flex md:flex-row flex-col gap-2">
                             <button
                                 onClick={() => { evaluarColaborador('evaluacion', idUsuario, evaluacion.idEvaluacion); setOpenModal(false); }}
                                 className='bg-zverde text-white py-1 disabled:cursor-not-allowed disabled:bg-zverde/60 px-3 rounded-md shadow-md hover:bg-zverde/70 focus:outline-none transition'
-                                disabled={!evaluacion.activa || usuario.Empresas.length === 0 || evaluacion.UsuariosEvaluaciones.attempt >= evaluacion.UsuariosEvaluaciones.maxAttempts}
+                                disabled={!evaluacion.activa || usuario.Empresas.length === 0 || (!colaborador ? evaluacion.UsuariosEvaluaciones.attempt >= evaluacion.UsuariosEvaluaciones.maxAttempts : usuario.usuariosEvaluadores.completado)}
                             >
                                 Evaluar
                             </button>
@@ -112,7 +114,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                     <button
                                         onClick={() => { evaluarColaborador('seguimiento', Number(idUsuario), Number(evaluacion.idEvaluacion)); setOpenModal(false); }}
                                         className="bg-zvioleta text-white py-1 px-3 rounded-md shadow-md hover:bg-zvioleta/70 focus:outline-none transition disabled:cursor-not-allowed disabled:bg-zvioleta/50"
-                                        disabled={usuario?.Empresas.length === 0}
+                                        disabled={usuario?.Empresas.length === 0 || !usuario.usuariosEvaluadores.completado}
                                     >
                                         Seguimiento
                                     </button>) : null

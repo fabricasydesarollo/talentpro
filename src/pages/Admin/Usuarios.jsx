@@ -10,6 +10,7 @@ import Pagination from '../../components/Pagination';
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import Loading from '../Loading';
+import BuscarUsuarios from '../../components/BuscarUsuarios';
 
 
 // import TableComponent from '../../components/TableComponent';
@@ -68,8 +69,9 @@ const Usuarios = () => {
         setAsignadosColaboradores(userData.colaboradores?.map(item => ({
               id: item.idUsuario,
               idUsuario: item.idUsuario,
+              idEvaluador: item.idEvaluador,
               nombre: item.nombre,
-              idEvaluacion: item.usuariosEvaluadores?.idEvaluacion
+              idEvaluacion: item.idEvaluacion
           })) || []);
         setIsCreate(false)
 
@@ -107,10 +109,10 @@ const Usuarios = () => {
       if(isCreate) {
         axios.post(`${URLBASE}/usuarios`, data)
         .then(() => {
-          toast.success('Usuario creado exitosamente!.')
+          toast.success('Usuario creado exitosamente!.', {toastId: "create-user-success", position: 'top-center', theme: 'colored', transition: 'Flip'})
           buscarUsuario(data)
         })
-        .catch(() => toast.success('Error al actualizar usuario.'))
+        .catch(() => toast.success('Error al actualizar usuario.', {toastId: "create-user-err", position: 'top-center', theme: 'colored', transition: 'Flip'}))
       }else{
         axios.put(`${URLBASE}/usuarios/${data.idUsuario}`, data)
           .then(() => {
@@ -140,13 +142,14 @@ const Usuarios = () => {
     return {
       nombre: sede.nombre,
       idSede: sede.idSede,
-      principal: sede.UsuariosSedes.principal,
-      reporte: sede.UsuariosSedes.reportes,
+      principal: sede.principal,
+      reporte: sede.reportes,
       empresa: empresa ? {
         nombre: empresa.nombre,
         idEmpresa: empresa.idEmpresa,
-        principal: empresa.UsuariosEmpresas.principal,
-        reporte: empresa.UsuariosEmpresas.reportes
+        principal: empresa.principal,
+        reporte: empresa.reportes,
+        activo: empresa.activo
       } : null
     };
   })
@@ -210,6 +213,8 @@ const Usuarios = () => {
     <div className="p-8 bg-gray-50 rounded-lg shadow-md mx-auto w-10/12">
       <Loading loading={loading} />
       <h1 className="text-4xl font-bold mb-8 text-center text-zvioleta">Administrar Usuarios</h1>
+
+      {/* <BuscarUsuarios /> */}
 
       <div className="mb-8">
         <form onSubmit={handleSubmitSearch(buscarUsuario)} className="flex gap-4">

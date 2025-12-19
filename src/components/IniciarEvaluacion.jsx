@@ -11,7 +11,7 @@ const IniciarEvaluacion = ({ onClose, setOnStart, fechas }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
       <div className="bg-white rounded-2xl p-8 w-11/12 md:w-2/3 lg:w-1/2 shadow-2xl">
         {/* Título */}
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Instrucciones</h1>
+        <h1 className="text-2xl font-bold text-zvioleta mb-4">Instrucciones</h1>
 
         {/* Contenido */}
         <p className="text-gray-600 mb-2">
@@ -36,6 +36,9 @@ const IniciarEvaluacion = ({ onClose, setOnStart, fechas }) => {
               </>
             )
           }
+        <p className="border-l-4 border-znaranja text-znaranja p-2 rounded-md my-3">
+          <strong>Importante:</strong> si sales de la página antes de enviar el formulario, tus respuestas no se guardarán.
+        </p>
         </div>
 
         {/* Botones */}
