@@ -28,8 +28,6 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     const [idEvaluacion, setIdEvaluacion] = useState(0)
     const [error, setError] = useState(null);
 
-    console.log(error)
-
 
     useEffect(() => {
         const fetchData = async () => {

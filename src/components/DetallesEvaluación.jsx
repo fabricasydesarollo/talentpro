@@ -50,9 +50,6 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
     return <Loading />
 }
 
-console.log(usuario)
-
-
     return (
         <div className="col-span-3 border border-white/20 rounded-2xl p-6 bg-white/5 shadow-lg">
             <h2 className="text-2xl font-semibold mb-4 text-zvioleta">

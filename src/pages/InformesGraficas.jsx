@@ -54,8 +54,6 @@ const InformesGraficas = () => {
     }
   }
 
-  console.log(isLoading)
-
   useEffect(() => {
     function filtrarSedes() {
       setSedes(cubrimiento?.totalUsuariosSede?.filter(sede => sede.idEmpresa == empresa.idEmpresa))
@@ -63,7 +61,6 @@ const InformesGraficas = () => {
     filtrarSedes()
   }, [empresa])
 
-  console.log(cubrimiento)
   const dataPieEvaluacion = cubrimiento?.avanceGlobal?.flatMap(item => {
     const rename = {
       ...item,

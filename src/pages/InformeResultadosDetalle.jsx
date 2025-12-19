@@ -14,7 +14,6 @@ import PropTypes from 'prop-types';
 
 const InformeResultadosDetalle = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
 
-    console.log(idEmpresa, idSede)
     const [datos, setDatos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const user = useUser()
