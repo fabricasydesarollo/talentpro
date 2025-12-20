@@ -11,7 +11,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
 import { DocumentScannerRounded } from '@mui/icons-material';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import LoadingGenerate from '../components/LoadingGenerate';
 
 const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {

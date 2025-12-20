@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { FaTimes, FaSearch, FaArrowRight, FaArrowLeft, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 const normalizeList = (list) => {
     return list
-        .filter((item) => item.idEmpresa || item.idSede || item.idUsuario) // Filtrar solo elementos con algún id definido
+        .filter((item) => item.idEmpresa || item.idSede || item.idUsuario)
         .map((item, index) => ({
             ...item,
-            id: item.idEmpresa || item.idSede || item.idUsuario, // Asignar `id` genérico
-            tipo: item.idEmpresa ? 'empresa' : item.idSede ? 'sede' : 'usuario', // Asignar el tipo
-            uniqueKey: `${item.idUsuario}-${index}`, // Generar clave única con `id`, tipo e índice
+            id: item.idEmpresa || item.idSede || item.idUsuario,
+            tipo: item.idEmpresa ? 'empresa' : item.idSede ? 'sede' : 'usuario',
+            uniqueKey: `${item.idUsuario}-${index}`,
         }));
 };
-
 
 const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     const { disponibles, asignados, onChange } = data;
@@ -24,23 +24,27 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDisponibles, setSelectedDisponibles] = useState([]);
     const [selectedAsignados, setSelectedAsignados] = useState([]);
-    const [evaluaciones, setEvaluaciones] = useState([])
-    const [idEvaluacion, setIdEvaluacion] = useState(0)
-    const [error, setError] = useState(null);
-
+    const [evaluaciones, setEvaluaciones] = useState([]);
+    const [idEvaluacion, setIdEvaluacion] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${URLBASE}/evaluaciones/gestionar`)
-                setEvaluaciones(response.data?.data || [])
-
+                setLoading(true);
+                const response = await axios.get(`${URLBASE}/evaluaciones/gestionar`);
+                setEvaluaciones(response.data?.data || []);
             } catch (error) {
-                toast.error('Ocurrio un error al obtener las evaluaciones', { toastId: 'eval-id' })
+                toast.error('Error al obtener las evaluaciones');
+            } finally {
+                setLoading(false);
             }
+        };
+        if (showModal) {
+            fetchData();
         }
-        fetchData()
-    }, [idUsuario]);
+    }, [showModal, idUsuario]);
 
     useEffect(() => {
         if (showModal && disponibles && asignados) {
@@ -55,10 +59,11 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
     }, [showModal, disponibles, asignados, idEvaluacion]);
 
     const filterList = (list) => {
+        if (!searchTerm.trim()) return list;
         return list.filter(
             (item) =>
-                item.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.id.toString().includes(searchTerm)
+                item?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item?.id?.toString().includes(searchTerm)
         );
     };
 
@@ -88,138 +93,261 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
         setSelectedAsignados([]);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (idEvaluacion === 0) {
-            setError('Por favor selecciona una evaluación antes de guardar.');
+            toast.error('Por favor selecciona una evaluación antes de guardar', {
+                position: 'top-center',
+                theme: 'colored'
+            });
             return;
         }
-        const colaboradoresAsignados = asignadosList.map((item) => ({
-            idUsuario: item.idUsuario || item.idEmpresa || item.idSede,
-            id: item.id,
-            nombre: item.nombre,
-            idEvaluacion: item.idEvaluacion
-        }));
 
-        
-        const usuariosAsignados = (colaboradoresAsignados?.length > 0 ?
-            colaboradoresAsignados.map(asignados => ({
-                idEvaluador: idUsuario,
-                idUsuario: asignados.id,
-                idEvaluacion: idEvaluacion
-            })) : [{
-                idEvaluador: idUsuario,
-                idUsuario: null
-            }]
-        );
+        try {
+            setSaving(true);
+            const colaboradoresAsignados = asignadosList.map((item) => ({
+                idUsuario: item.idUsuario || item.idEmpresa || item.idSede,
+                id: item.id,
+                nombre: item.nombre,
+                idEvaluacion: item.idEvaluacion
+            }));
 
-        axios.post(`${URLBASE}/usuarios/colaboradores`, {usuarios: usuariosAsignados})
-        .then(res => toast.success(res.data.message, {toastId: "toast-id-ok"}))
-        .catch(() => toast.error("No fue posible asignar los colaboradores!", {toastId: "idToast-err", position: 'top-center', theme: 'colored'}));
-        
-        onChange(colaboradoresAsignados);
-        onClose();
+            const usuariosAsignados = colaboradoresAsignados?.length > 0
+                ? colaboradoresAsignados.map(asignados => ({
+                    idEvaluador: idUsuario,
+                    idUsuario: asignados.id,
+                    idEvaluacion: idEvaluacion
+                }))
+                : [{
+                    idEvaluador: idUsuario,
+                    idUsuario: null
+                }];
+
+            const res = await axios.post(`${URLBASE}/usuarios/colaboradores`, { usuarios: usuariosAsignados });
+            toast.success(res.data.message);
+            onChange(colaboradoresAsignados);
+            onClose();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "No fue posible asignar los colaboradores", {
+                position: 'top-center',
+                theme: 'colored'
+            });
+        } finally {
+            setSaving(false);
+        }
     };
-
-    if(error){
-        toast.error(error, { toastId: 'modal-error-id', autoClose: 3000, position: 'top-center', theme: 'colored' });
-        setError(null);
-    }
 
     if (!showModal) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
-                <h2 className="text-2xl font-bold mb-4 text-znaranja">{`Asignar ${type}`}</h2>
-                <div className="flex flex-col mb-4">
-                    <label htmlFor="id-evaluacion">Seleccione una Evaluación</label>
-                    <select
-                        value={idEvaluacion}
-                        onChange={(e) => setIdEvaluacion(Number(e.target.value))}
-                        className={`${idEvaluacion === 0 ? 'border-red-500 border-2' : 'border-gray-300'} w-full rounded-md focus:ring-2 focus:ring-offset-1 focus:ring-zvioleta focus:outline-none focus:border-transparent`} name="evaluacion" id="id-evaluacion" >
-                        <option value="0" selected>Seleccione...</option>
-                        {evaluaciones.map((evaluacion, index) => (
-                            <option key={index} value={evaluacion.idEvaluacion}>{`${evaluacion.nombre} ${evaluacion.year}`}</option>
-                        ))}
-                    </select>
-                </div>
-                    {
-                        idEvaluacion === 0 && <p className="text-red-500 text-sm mt-1 mb-4">* Debes seleccionar una evaluación antes de guardar.</p>
-                    }
-                    <p className='text-znaranja text-sm mt-1 mb-4'>** Asegurate que la evaluación seleccionada es la correcta **</p>
-                <input
-                    type="text"
-                    placeholder="Buscar por documento o nombre..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full mb-4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-offset-1 focus:ring-zvioleta focus:outline-none focus:border-transparent"
-                />
-                <div className="flex gap-4">
-                    <div className="w-1/2">
-                        <h3 className="text-lg font-semibold mb-2">Disponibles</h3>
-                        <ul className="border rounded-lg p-2 h-64 overflow-y-auto">
-                            {filterList(disponiblesList).map((item) => (
-                                <li key={item.uniqueKey} className="flex items-center p-2 border-b">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedDisponibles.includes(item.id)}
-                                        onChange={() => toggleSelection(item.id, true)}
-                                        className="mr-2 h-4 w-4
-                                                border border-znaranja rounded-md
-                                                checked:bg-znaranja checked:border-znaranja 
-                                                focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-znaranja
-                                                cursor-pointer"
-                                    />
-                                    <span>{`${item.id} - ${item.nombre}`}</span>
-                                </li>
-                            ))}
-                        </ul>
-                        <button
-                            onClick={asignarSeleccionados}
-                            disabled={!selectedDisponibles.length}
-                            className="mt-2 bg-zverde text-white px-3 py-1 rounded"
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto shadow-2xl">
+                <div className="p-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-2xl font-bold text-zvioleta flex items-center gap-2">
+                                <FaCheck className="text-znaranja" />
+                                Asignar {type}
+                            </h2>
+                            <p className="text-gray-600 text-sm mt-1">Selecciona una evaluación y gestiona las asignaciones</p>
+                        </div>
+                        <button 
+                            onClick={onClose} 
+                            className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
                         >
-                            Asignar
+                            <FaTimes className="text-xl" />
                         </button>
                     </div>
 
-                    <div className="w-1/2">
-                        <h3 className="text-lg font-semibold mb-2">Asignados</h3>
-                        <ul className="border rounded-lg p-2 h-64 overflow-y-auto">
-                            {filterList(asignadosList).map((item) => (
-                                <li key={item.uniqueKey} className="flex items-center p-2 border-b">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedAsignados.includes(item.id)}
-                                        onChange={() => toggleSelection(item.id, false)}
-                                        className="mr-2 h-4 w-4
-                                                border border-znaranja rounded-md
-                                                checked:bg-znaranja checked:border-znaranja 
-                                                focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-znaranja
-                                                cursor-pointer"
-                                    />
-                                    <span>{`${item.id} - ${item.nombre}`}</span>
-                                </li>
-                            ))}
-                        </ul>
-                        <button
-                            onClick={desasignarSeleccionados}
-                            disabled={!selectedAsignados.length}
-                            className="mt-2 bg-zvioleta text-white px-3 py-1 rounded"
+                    {/* Evaluation Selection */}
+                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                        <label htmlFor="id-evaluacion" className="block text-sm font-medium text-gray-700 mb-2">
+                            Seleccionar Evaluación *
+                        </label>
+                        <select
+                            value={idEvaluacion}
+                            onChange={(e) => setIdEvaluacion(Number(e.target.value))}
+                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent transition-colors ${
+                                idEvaluacion === 0 ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
+                            }`}
+                            name="evaluacion" 
+                            id="id-evaluacion"
                         >
-                            Quitar
+                            <option value="0">Seleccione una evaluación...</option>
+                            {evaluaciones.map((evaluacion) => (
+                                <option key={evaluacion.idEvaluacion} value={evaluacion.idEvaluacion}>
+                                    {`${evaluacion.nombre} ${evaluacion.year}`}
+                                </option>
+                            ))}
+                        </select>
+                        {idEvaluacion === 0 && (
+                            <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+                                <FaExclamationTriangle className="text-xs" />
+                                <span>Debes seleccionar una evaluación antes de guardar</span>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-2 mt-2 text-znaranja text-sm">
+                            <FaExclamationTriangle className="text-xs" />
+                            <span>Asegúrate que la evaluación seleccionada es la correcta</span>
+                        </div>
+                    </div>
+
+                    {/* Search */}
+                    <div className="mb-6">
+                        <div className="relative">
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Buscar por documento o nombre..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Assignment Interface */}
+                    <div className="grid grid-cols-2 gap-6">
+                        {/* Available List */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center justify-between">
+                                    Disponibles
+                                    <span className="text-sm font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                        {filterList(disponiblesList).length}
+                                    </span>
+                                </h3>
+                            </div>
+                            <div className="p-2">
+                                <div className="h-64 overflow-y-auto">
+                                    {filterList(disponiblesList).length > 0 ? (
+                                        filterList(disponiblesList).map((item) => (
+                                            <div
+                                                key={item.uniqueKey}
+                                                className={`flex items-center p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                                                    selectedDisponibles.includes(item.id) ? 'bg-blue-50 border-blue-200' : ''
+                                                }`}
+                                                onClick={() => toggleSelection(item.id, true)}
+                                            >
+                                                <div className={`w-4 h-4 border-2 rounded mr-3 flex items-center justify-center ${
+                                                    selectedDisponibles.includes(item.id)
+                                                        ? 'border-znaranja bg-znaranja'
+                                                        : 'border-gray-300'
+                                                }`}>
+                                                    {selectedDisponibles.includes(item.id) && (
+                                                        <FaCheck className="text-white text-xs" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                        {item.nombre}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">ID: {item.id}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                                            {searchTerm ? 'No se encontraron resultados' : 'No hay elementos disponibles'}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-2 border-t border-gray-200">
+                                    <button
+                                        onClick={asignarSeleccionados}
+                                        disabled={!selectedDisponibles.length}
+                                        className="w-full flex items-center justify-center gap-2 bg-zverde hover:bg-zverde/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                    >
+                                        <FaArrowRight className="text-xs" />
+                                        Asignar ({selectedDisponibles.length})
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Assigned List */}
+                        <div className="bg-white border border-gray-200 rounded-lg">
+                            <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center justify-between">
+                                    Asignados
+                                    <span className="text-sm font-normal bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                        {filterList(asignadosList).length}
+                                    </span>
+                                </h3>
+                            </div>
+                            <div className="p-2">
+                                <div className="h-64 overflow-y-auto">
+                                    {filterList(asignadosList).length > 0 ? (
+                                        filterList(asignadosList).map((item) => (
+                                            <div
+                                                key={item.uniqueKey}
+                                                className={`flex items-center p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                                                    selectedAsignados.includes(item.id) ? 'bg-red-50 border-red-200' : ''
+                                                }`}
+                                                onClick={() => toggleSelection(item.id, false)}
+                                            >
+                                                <div className={`w-4 h-4 border-2 rounded mr-3 flex items-center justify-center ${
+                                                    selectedAsignados.includes(item.id)
+                                                        ? 'border-zvioleta bg-zvioleta'
+                                                        : 'border-gray-300'
+                                                }`}>
+                                                    {selectedAsignados.includes(item.id) && (
+                                                        <FaCheck className="text-white text-xs" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                        {item.nombre}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">ID: {item.id}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                                            {searchTerm ? 'No se encontraron resultados' : 'No hay elementos asignados'}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="p-2 border-t border-gray-200">
+                                    <button
+                                        onClick={desasignarSeleccionados}
+                                        disabled={!selectedAsignados.length}
+                                        className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                                    >
+                                        <FaArrowLeft className="text-xs" />
+                                        Quitar ({selectedAsignados.length})
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+                        <button 
+                            onClick={onClose} 
+                            className="px-6 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            disabled={saving || idEvaluacion === 0}
+                            className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            {saving ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    Guardando...
+                                </>
+                            ) : (
+                                <>
+                                    <FaCheck className="text-sm" />
+                                    Guardar Asignaciones
+                                </>
+                            )}
                         </button>
                     </div>
-                </div>
-
-                <div className="flex justify-end gap-4 mt-6">
-                    <button onClick={onClose} className="bg-znaranja text-white px-4 py-2 rounded-lg">
-                        Cancelar
-                    </button>
-                    <button type='button' 
-                        onClick={handleSave} className="bg-zvioleta text-white px-4 py-2 rounded-lg">
-                        Guardar
-                    </button>
                 </div>
             </div>
         </div>

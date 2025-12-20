@@ -2,7 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { URLBASE } from "../../lib/actions"
 import { useForm } from "react-hook-form"
-import { toast } from "react-toastify"
+import { toast } from "sonner"
 import { PiPencilSimpleLineFill } from "react-icons/pi"
 import { IoEyeSharp } from "react-icons/io5";
 import AsignarEvaluacion from "../../components/AsignarEvaluacion"

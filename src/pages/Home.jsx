@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import Modal from 'react-modal'
 import FormUpdatePassword from '../components/FormUpdatePassword'
 import DesarrollandoTalentosBanner from '/Desarrollando_talentos_Banner.webp'
@@ -56,70 +56,107 @@ const Home = () => {
     }, [user]);
 
     return (
-        <div className="flex flex-col gap-4 bg-gray-100 p-8 shadow-2xl rounded-lg max-w-7xl my-5">
-            <div className="text-center">
-                <h1 className="font-extrabold text-4xl text-zvioleta mb-2">
-                    {evaluacion ? `${evaluacion?.nombre} ${evaluacion.year}` : `EVALUACIONES TALENT PRO ${new Date().getFullYear()}`}
-                </h1>
-            </div>
-            <div className=''>
-                <img src={DesarrollandoTalentosBanner} alt="DesarrollandoTalentosBanner" />
-            </div>
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-5xl mx-auto space-y-6">
+                
+                {/* Header Section */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-zvioleta p-6 text-white">
+                        <h1 className="text-2xl sm:text-3xl font-semibold">
+                            {evaluacion ? `${evaluacion?.nombre} ${evaluacion.year}` : `EVALUACIONES TALENT PRO ${new Date().getFullYear()}`}
+                        </h1>
+                    </div>
+                    
+                    <div className="p-0">
+                        <img 
+                            src={DesarrollandoTalentosBanner} 
+                            alt="DesarrollandoTalentosBanner" 
+                            className="w-full h-auto object-cover"
+                        />
+                    </div>
+                </div>
 
-            <Modal isOpen={showModal} ariaHideApp={false} onRequestClose={closeModal}>
-                <FormUpdatePassword />
-            </Modal>
-            <p className='text-gray-700 text-base leading-relaxed mt-2'>
-                Bienvenido(a).<br></br>
-                El propósito de esta evaluación es valorar tus fortalezas y áreas de mejora, promoviendo el desarrollo continuo.
-            </p>
-            <div className="text-gray-700">
-                <p className="text-base">Se realizará:</p>
-                <ul className="list-disc ml-5 mt-2 text-base space-y-1 text-znaranja font-bold">
-                    <li>Autoevaluación</li>
-                    <li>Evaluación por parte del Jefe Inmediato.</li>
-                </ul>
-            </div>
+                {/* Welcome Message */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <p className="text-gray-700 text-base leading-relaxed">
+                        Bienvenido(a).<br />
+                        El propósito de esta evaluación es valorar tus fortalezas y áreas de mejora, promoviendo el desarrollo continuo.
+                    </p>
+                </div>
 
-            <p className="text-gray-700 leading-relaxed">
-            Si tienes personal a cargo, asegúrate de completar tu Autoevaluación y organizar sesiones con tu equipo para realizar la evaluación y brindar retroalimentación.
-            </p>
-            
-            <div className="flex flex-col gap-6">
-                <p className="text-gray-800 text-sm md:text-base">
-                Al iniciar, encontrarás los criterios que forman parte de esta evaluación, junto con la siguiente escala de calificación. por favor lee con detenimiento:
-                </p>
-                <table className="border-collapse border border-gray-300 shadow-md rounded-lg overflow-hidden max-w-screen-sm">
-                    <thead>
-                        <tr className="bg-gradient-to-r from-zvioleta to-znaranja text-white">
-                            <th className="border border-gray-300 p-2 text-left">Calificación</th>
-                            <th className="border border-gray-300 p-2 text-left">Descripción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr >
-                            <td className="border border-gray-300 p-2 text-center font-semibold text-zvioleta">5</td>
-                            <td className="border border-gray-300 p-2 text-gray-700">Supera las expectativas</td>
-                        </tr>
-                        <tr >
-                            <td className="border border-gray-300 p-2 text-center font-semibold text-zvioleta">4</td>
-                            <td className="border border-gray-300 p-2 text-gray-700">Cumple todas las expectativas</td>
-                        </tr>
-                        <tr >
-                            <td className="border border-gray-300 p-2 text-center font-semibold text-zvioleta">3</td>
-                            <td className="border border-gray-300 p-2 text-gray-700">Cumple la mayoría de las expectativas</td>
-                        </tr>
-                        <tr >
-                            <td className="border border-gray-300 p-2 text-center font-semibold text-zvioleta">2</td>
-                            <td className="border border-gray-300 p-2 text-gray-700">Cumple parcialmente las expectativas</td>
-                        </tr>
-                        <tr >
-                            <td className="border border-gray-300 p-2 text-center font-semibold text-zvioleta">1</td>
-                            <td className="border border-gray-300 p-2 text-gray-700">No cumple las expectativas</td>
-                        </tr>
-                    </tbody>
-                </table>
+                {/* Evaluation Types */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <p className="text-gray-800 text-base font-medium mb-3">Se realizará:</p>
+                    <ul className="space-y-2 ml-5">
+                        <li className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-znaranja rounded-full"></div>
+                            <span className="text-znaranja font-bold text-base">Autoevaluación</span>
+                        </li>
+                        <li className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-znaranja rounded-full"></div>
+                            <span className="text-znaranja font-bold text-base">Evaluación por parte del Jefe Inmediato.</span>
+                        </li>
+                    </ul>
+                    
+                    <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r">
+                        <p className="text-gray-700 leading-relaxed">
+                            Si tienes personal a cargo, asegúrate de completar tu Autoevaluación y organizar sesiones con tu equipo para realizar la evaluación y brindar retroalimentación.
+                        </p>
+                    </div>
+                </div>
 
+                {/* Rating Scale */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <p className="text-gray-800 text-sm md:text-base mb-4">
+                        Al iniciar, encontrarás los criterios que forman parte de esta evaluación, junto con la siguiente escala de calificación. por favor lee con detenimiento:
+                    </p>
+                    
+                    <div className="overflow-x-auto">
+                        <table className="border-collapse border border-gray-300 shadow-md rounded-lg overflow-hidden max-w-screen-sm w-full">
+                            <thead>
+                                <tr className="bg-gradient-to-r from-zvioleta to-znaranja text-white">
+                                    <th className="border border-gray-300 p-3 text-left">Calificación</th>
+                                    <th className="border border-gray-300 p-3 text-left">Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className="hover:bg-gray-50">
+                                    <td className="border border-gray-300 p-3 text-center font-semibold text-zvioleta">5</td>
+                                    <td className="border border-gray-300 p-3 text-gray-700">Supera las expectativas</td>
+                                </tr>
+                                <tr className="hover:bg-gray-50">
+                                    <td className="border border-gray-300 p-3 text-center font-semibold text-zvioleta">4</td>
+                                    <td className="border border-gray-300 p-3 text-gray-700">Cumple todas las expectativas</td>
+                                </tr>
+                                <tr className="hover:bg-gray-50">
+                                    <td className="border border-gray-300 p-3 text-center font-semibold text-zvioleta">3</td>
+                                    <td className="border border-gray-300 p-3 text-gray-700">Cumple la mayoría de las expectativas</td>
+                                </tr>
+                                <tr className="hover:bg-gray-50">
+                                    <td className="border border-gray-300 p-3 text-center font-semibold text-zvioleta">2</td>
+                                    <td className="border border-gray-300 p-3 text-gray-700">Cumple parcialmente las expectativas</td>
+                                </tr>
+                                <tr className="hover:bg-gray-50">
+                                    <td className="border border-gray-300 p-3 text-center font-semibold text-zvioleta">1</td>
+                                    <td className="border border-gray-300 p-3 text-gray-700">No cumple las expectativas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Modal */}
+                <Modal 
+                    isOpen={showModal} 
+                    ariaHideApp={false} 
+                    onRequestClose={closeModal}
+                    className="fixed inset-0 flex items-center justify-center p-4 z-50"
+                    overlayClassName="fixed inset-0 bg-black/50 z-40"
+                >
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <FormUpdatePassword />
+                    </div>
+                </Modal>
             </div>
         </div>
     );

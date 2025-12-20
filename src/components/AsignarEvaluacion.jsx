@@ -4,7 +4,7 @@ import { URLBASE } from "../lib/actions";
 import { normalizarData } from "../lib/utils";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { LuSave } from "react-icons/lu";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 
 const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {

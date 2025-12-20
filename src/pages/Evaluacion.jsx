@@ -4,7 +4,7 @@ import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import ComentariosAcciones from '../components/ComentariosAcciones';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import Loading from './Loading';
 import IniciarEvaluacion from '../components/IniciarEvaluacion';
 import { smoothScrollTo } from '../lib/utils';

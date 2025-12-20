@@ -6,8 +6,7 @@ import ProtectedLayout from './components/ProtectedLayout';
 import Resultados from './pages/Resultados';
 import Home from './pages/Home';
 import InformesGraficas from './pages/InformesGraficas';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'sonner';
 import Usuarios from './pages/Admin/Usuarios';
 import NotFound from './pages/NotFound';
 import Seguimiento from './pages/Seguimiento';
@@ -27,7 +26,23 @@ import { ReportCenter } from './pages/ReportCenter';
 function App() {
   return (
     <>
-      <ToastContainer />
+      <Toaster 
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+          style: {
+            background: 'white',
+            border: '1px solid #e5e7eb',
+            borderRadius: '12px',
+            fontSize: '14px',
+            padding: '16px',
+          },
+          className: 'sonner-toast',
+          duration: 4000,
+        }}
+        theme="light"
+      />
       <Routes>
         {/* Ruta principal: Login */}
         <Route path="/" element={<Login />} />

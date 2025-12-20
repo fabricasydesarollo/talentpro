@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { URLBASE } from '../../lib/actions';
 import Modal from '../../components/Modal';
 import EvaluacionesModal from '../../components/EvaluacionesModal';
@@ -10,7 +10,7 @@ import Pagination from '../../components/Pagination';
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import Loading from '../Loading';
-import BuscarUsuarios from '../../components/BuscarUsuarios';
+import { FaSearch, FaUser, FaBuilding, FaPlus, FaEdit } from 'react-icons/fa';
 
 
 // import TableComponent from '../../components/TableComponent';
@@ -34,8 +34,7 @@ const Usuarios = () => {
   const [dataRender, setDataRender] = useState({
     empresas: []
   })
-  const [isCreate, setIsCreate] = useState(true)
-
+  const [isCreate, setIsCreate] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,104 +209,379 @@ const Usuarios = () => {
 
 
   return (
-    <div className="p-8 bg-gray-50 rounded-lg shadow-md mx-auto w-10/12">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       <Loading loading={loading} />
-      <h1 className="text-4xl font-bold mb-8 text-center text-zvioleta">Administrar Usuarios</h1>
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+            Administrar Usuarios
+          </h1>
+        </div>
 
-      {/* <BuscarUsuarios /> */}
-
-      <div className="mb-8">
-        <form onSubmit={handleSubmitSearch(buscarUsuario)} className="flex gap-4">
-          <input
-            type="number"
-            {...registerSearch('idUsuario')}
-            placeholder="Buscar por numero de documento"
-            className="border p-3 rounded-lg w-full"
-          />
-          <input
-            type="email"
-            disabled={true}
-            {...registerSearch('correo')}
-            placeholder="Correo"
-            className="border p-3 rounded-lg w-full cursor-not-allowed bg-gray-50 border-gray-300 text-gray-600"
-          />
-          <button className="bg-zvioleta text-white px-6 py-3 rounded-lg">
-            {loading ? 'Buscando...' : 'Buscar'}
-          </button>
-        </form>
-      </div>
-
-      <form onSubmit={handleSubmit(actualizarUsuario)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 mb-2">ID Usuario</label>
-            <input type="number" {...register('idUsuario', { required: true })} className={`border p-3 rounded-lg w-full ${isCreate ? '': 'cursor-not-allowed bg-gray-50'}`} disabled={!isCreate} />
+        {/* Search Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <FaSearch className="text-gray-500" size={20} />
+            <h2 className="text-lg font-medium text-gray-900">Buscar Usuario</h2>
           </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Nombre</label>
-            <input type="text" {...register('nombre', { required: true })} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Correo</label>
-            <input type="email" {...register('correo', { required: true })} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Cargo</label>
-            <input type="text" {...register('cargo', { required: true })} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Área</label>
-            <input type="text" {...register('area')} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Fecha de ingreso</label>
-            <input type="date" {...register('fechaIngreso')} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Perfil</label>
-            <select {...register('idPerfil', { required: true })} className="border p-3 rounded-lg w-full">
-              {perfiles.length > 0 ? perfiles?.map((perfil) => (
-                <option key={perfil.idPerfil} value={perfil.idPerfil}>{perfil.nombre}</option>
-              )) : (
-                <option defaultValue={""} value="">Cargando perfiles...</option>
-              )}
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Nivel de Cargo</label>
-            <select {...register('idNivelCargo', { required: true })} className="border p-3 rounded-lg w-full">
-              {nivelesCargo?.map((nivel) => (
-                <option key={nivel.idNivelCargo} value={nivel.idNivelCargo}>{nivel.nombre}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-2">Contraseña</label>
-            <input type="password" {...register('contrasena')} className="border p-3 rounded-lg w-full" />
-          </div>
-          <div className='flex justify-around items-center'>
-            <div className='flex flex-col'>
-              <label className="block text-gray-700 mb-2">¿Cambiar contraseña?</label>
-              <input type="checkbox" {...register('defaultContrasena')} className="border p-3 rounded-lg" />
+          
+          <form onSubmit={handleSubmitSearch(buscarUsuario)} className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Número de Documento
+              </label>
+              <input
+                type="number"
+                {...registerSearch('idUsuario')}
+                placeholder="Ingrese el número de documento"
+                className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5"
+              />
             </div>
-            <div className='flex flex-col'>
-              <label className="block text-gray-700 mb-2">¿Activo?</label>
-              <input type="checkbox" {...register('activo')} className="border p-3 rounded-lg" />
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Correo (Deshabilitado)
+              </label>
+              <input
+                type="email"
+                disabled={true}
+                {...registerSearch('correo')}
+                placeholder="Correo electrónico"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 cursor-not-allowed bg-gray-50 text-gray-500"
+              />
             </div>
+            <div className="flex flex-col justify-end">
+              <button 
+                type="submit"
+                className="bg-zvioleta hover:bg-zvioleta/90 text-white px-6 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm"
+                disabled={loading}
+              >
+                <FaSearch size={16} />
+                {loading ? 'Buscando...' : 'Buscar'}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* User Form */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <FaUser className="text-gray-500" size={20} />
+            <h2 className="text-lg font-medium text-gray-900">
+              {isCreate ? 'Crear Usuario' : 'Editar Usuario'}
+            </h2>
+          </div>
+
+          <form onSubmit={handleSubmit(actualizarUsuario)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">ID Usuario</label>
+                <input 
+                  type="number" 
+                  {...register('idUsuario', { required: true })} 
+                  className={`w-full border border-gray-300 rounded-lg px-4 py-2.5 ${isCreate ? 'focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta' : 'cursor-not-allowed bg-gray-50 text-gray-500'}`} 
+                  disabled={!isCreate} 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                <input 
+                  type="text" 
+                  {...register('nombre', { required: true })} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Correo</label>
+                <input 
+                  type="email" 
+                  {...register('correo', { required: true })} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cargo</label>
+                <input 
+                  type="text" 
+                  {...register('cargo', { required: true })} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Área</label>
+                <input 
+                  type="text" 
+                  {...register('area')} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de ingreso</label>
+                <input 
+                  type="date" 
+                  {...register('fechaIngreso')} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Perfil</label>
+                <select 
+                  {...register('idPerfil', { required: true })} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5"
+                >
+                  <option value="">Seleccione un perfil...</option>
+                  {perfiles.length > 0 ? perfiles?.map((perfil) => (
+                    <option key={perfil.idPerfil} value={perfil.idPerfil}>{perfil.nombre}</option>
+                  )) : (
+                    <option value="">Cargando perfiles...</option>
+                  )}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nivel de Cargo</label>
+                <select 
+                  {...register('idNivelCargo', { required: true })} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5"
+                >
+                  <option value="">Seleccione un nivel...</option>
+                  {nivelesCargo?.map((nivel) => (
+                    <option key={nivel.idNivelCargo} value={nivel.idNivelCargo}>{nivel.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                <input 
+                  type="password" 
+                  {...register('contrasena')} 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5" 
+                />
+              </div>
+              <div className="flex justify-around items-center">
+                <div className="flex flex-col items-center">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">¿Cambiar contraseña?</label>
+                  <input 
+                    type="checkbox" 
+                    {...register('defaultContrasena')} 
+                    className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  />
+                </div>
+                <div className="flex flex-col items-center">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">¿Activo?</label>
+                  <input 
+                    type="checkbox" 
+                    {...register('activo')} 
+                    className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={() => setShowModal({ type: 'Colaboradores', open: true })}
+                className="bg-zvioleta hover:bg-zvioleta/90 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              >
+                <FaUser size={16} />
+                Asignar Colaboradores
+              </button>
+              <EvaluacionesModal 
+                evaluaciones={evaluacion} 
+                idColaborador={usuario?.idUsuario} 
+                buscarUsuario={() => buscarUsuario({ idUsuario: usuario?.idUsuario })} 
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button 
+                type="submit" 
+                className="bg-zverde hover:bg-zverde/90 text-white px-6 py-3 rounded-lg transition-colors duration-200 font-medium"
+              >
+                {isCreate ? 'Crear Usuario' : 'Actualizar Usuario'}
+              </button>
+              <button 
+                type="button" 
+                onClick={cancelarBusqueda} 
+                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors duration-200 font-medium"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+        {/* Companies and Locations Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <FaBuilding className="text-gray-500" size={20} />
+            <h2 className="text-lg font-medium text-gray-900">Empresas y Sedes Asignadas</h2>
+          </div>
+
+          <form onSubmit={handleSubmitBusiness(asignarEmpresa)} className="mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Empresa</label>
+                <select
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5"
+                  {...registerBusiness("idEmpresa", {
+                    onChange: (e) => changeSedes(e.target.value)
+                  })}
+                >
+                  <option value="">Seleccione una empresa...</option>
+                  {empresas.map(empresa => (
+                    <option value={empresa.idEmpresa} key={empresa.idEmpresa}>
+                      {empresa.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sede</label>
+                <select 
+                  className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5"
+                  {...registerBusiness("idSede")}
+                >
+                  <option value="">Seleccione una sede...</option>
+                  {sedesRender?.map(sede => (
+                    <option value={sede?.idSede} key={sede?.idSede}>
+                      {sede?.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">¿Principal?</label>
+                <input 
+                  type="checkbox" 
+                  className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  {...registerBusiness("principal")} 
+                />
+              </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">¿Rep Empresa?</label>
+                <input 
+                  type="checkbox" 
+                  className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  {...registerBusiness("repEmpresa")} 
+                />
+              </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">¿Rep Sede?</label>
+                <input 
+                  type="checkbox" 
+                  className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  {...registerBusiness("repSede")} 
+                />
+              </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">¿Activo?</label>
+                <input 
+                  type="checkbox" 
+                  defaultChecked={true} 
+                  className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta" 
+                  {...registerBusiness("activo")} 
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button 
+                type="submit"
+                className="bg-zverde hover:bg-zverde/90 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              >
+                <FaPlus size={14} />
+                Agregar
+              </button>
+              <button 
+                type="button" 
+                onClick={cancelAction} 
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3">Empresa</th>
+                  <th scope="col" className="px-6 py-3">Sede</th>
+                  <th scope="col" className="px-6 py-3 text-center">¿Principal?</th>
+                  <th scope="col" className="px-6 py-3 text-center">¿Reporte Empresa?</th>
+                  <th scope="col" className="px-6 py-3 text-center">¿Reporte Sede?</th>
+                  <th scope="col" className="px-6 py-3 text-center">¿Activo?</th>
+                  <th scope="col" className="px-6 py-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataRender.empresas?.map((sede, index) => (
+                  <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200" key={`empresas-${index}`}>
+                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                      {sede.empresa?.nombre}
+                    </th>
+                    <td className="px-6 py-4">
+                      {sede.nombre || 'Sin asignar'}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {sede.principal ? 
+                        <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" /> : 
+                        <MdOutlineCheckBoxOutlineBlank className="text-gray-400 text-lg mx-auto" />
+                      }
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {sede.empresa?.reporte ? 
+                        <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" /> : 
+                        <MdOutlineCheckBoxOutlineBlank className="text-gray-400 text-lg mx-auto" />
+                      }
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {sede.reporte ? 
+                        <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" /> : 
+                        <MdOutlineCheckBoxOutlineBlank className="text-gray-400 text-lg mx-auto" />
+                      }
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {sede.activo ? 
+                        <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" /> : 
+                        <MdOutlineCheckBoxOutlineBlank className="text-gray-400 text-lg mx-auto" />
+                      }
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button 
+                        onClick={() => updateBusiness(sede.empresa?.idEmpresa, sede?.idSede)} 
+                        className="text-zvioleta hover:text-zvioleta/80 transition-colors duration-200"
+                        title="Editar"
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4">
+            <Pagination 
+              dataFetch={empresasSedesUsuarios?.sort((a, b) => a.empresa?.nombre.localeCompare(b.empresa?.nombre))} 
+              clave={"empresas"} 
+              key={1} 
+              totalRows={10} 
+              setData={setDataRender} 
+            />
           </div>
         </div>
 
-        <div className="flex gap-4 mt-6">
-
-          <button
-            type="button"
-            onClick={() => setShowModal({ type: 'Colaboradores', open: true })}
-            className="bg-zvioleta text-white px-4 py-2 rounded-lg"
-          >
-            Asignar Colaboradores
-          </button>
-          <EvaluacionesModal evaluaciones={evaluacion} idColaborador={usuario?.idUsuario} buscarUsuario={() => buscarUsuario({ idUsuario: usuario?.idUsuario })} />
-        </div>
+        {/* Modal */}
         <Modal
           showModal={showModal.open}
           idUsuario={usuario?.idUsuario || 1}
@@ -321,124 +595,8 @@ const Usuarios = () => {
             }
           }}
         />
-        <div className="flex gap-4 mt-8 w-1/3">
-          <button type="submit" className="bg-zverde text-white px-6 py-3 rounded-lg w-full hover:scale-105">Guardar</button>
-          <button type="button" onClick={cancelarBusqueda} className="bg-zcinza text-black px-6 py-3 rounded-lg w-full hover:scale-105">
-            Cancelar
-          </button>
-        </div>
-      </form>
-      <h2 className='text-zvioleta text-2xl font-bold my-4'>Empresas y sedes asignadas</h2>
-      <form className='flex gap-4 w-full justify-around items-center' onSubmit={handleSubmitBusiness(asignarEmpresa)}>
-        <div className='' >
-          <label htmlFor={`empresa`}>Empresa</label>
-          <select
-            name="empresa"
-            id={`empresa`}
-            className='input-custom'
-            {...registerBusiness("idEmpresa", {
-              onChange: (e) => changeSedes(e.target.value)
-            })}
-          >
-            <option value="" selected defaultValue={""} >Seleccione</option>
-            {
-              empresas.map(empresa => (
-                <option value={empresa.idEmpresa} key={empresa.idEmpresa}>{empresa.nombre}</option>
-              ))
-            }
-          </select>
-        </div>
-        <div className=''>
-          <label htmlFor={`sede`}>Sede</label>
-          <select name="sede" id={`sede`} className='input-custom' {...registerBusiness("idSede")}>
-            <option value="" selected defaultValue={""} >Seleccione</option>
-            {
-              sedesRender?.map(sede => (
-                <option value={sede?.idSede} key={sede?.idSede}>{sede?.nombre}</option>
-              ))
-            }
-          </select>
-        </div>
-        <div className='flex justify-center items-center flex-col'>
-          <label htmlFor={`principal`} className='block text-gray-500'>¿Principal?</label>
-          <input type="checkbox" name="principal" id={`principal`} className='border p-2 rounded-lg' {...registerBusiness("principal")} />
-        </div>
-        <div className='flex justify-center items-center flex-col'>
-          <label htmlFor={`rep-empresa`} className='block text-gray-500'>¿Rep Empresa?</label>
-          <input type="checkbox" name="reporte-empresa" id={`rep-empresa`} className='border p-2 rounded-lg' {...registerBusiness("repEmpresa")} />
-        </div>
-        <div className='flex justify-center items-center flex-col'>
-          <label htmlFor={`rep-sede`} className='block text-gray-500'>¿Rep Sede?</label>
-          <input type="checkbox" name="reporte" id={`rep-sede`} className='border p-2 rounded-lg' {...registerBusiness("repSede")} />
-        </div>
-        <div className='flex justify-center items-center flex-col'>
-          <label htmlFor={`activo`} className='block text-gray-500'>¿Activo?</label>
-          <input type="checkbox" defaultChecked={true} name="activo" id={`activo`} className='border p-2 rounded-lg'{...registerBusiness("activo")} />
-        </div>
-        <div className='flex gap-2'>
-          <button className='bg-zverde text-white py-1 px-3 rounded-md hover:scale-105 hover:bg-zverde/90'>Agregar</button>
-          <button type='button' onClick={cancelAction} className='bg-zcinza text-black py-1 px-3 rounded-md hover:scale-105 hover:bg-zcinza/90'>Cancelar</button>
-        </div>
-      </form>
-      <table className="w-full text-md text-left rtl:text-right text-gray-500 mb-8">
-        <thead className="text-md text-gray-700 uppercase bg-gray-50">
-          <tr>
-            <th scope="col" className="px-6 py-3">
-              Empresa
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Sede
-            </th>
-            <th scope="col" className="px-6 py-3">
-              ¿Principal?
-            </th>
-            <th scope="col" className="px-6 py-3">
-              ¿Reporte Empresa?
-            </th>
-            <th scope="col" className="px-6 py-3">
-              ¿Reporte Sede?
-            </th>
-            <th scope="col" className="px-6 py-3">
-              ¿Activo?
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Acciones
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            dataRender.empresas?.map((sede, index) => (
-              <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200" key={`empresas-${index}`}>
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
-                  {sede.empresa?.nombre}
-                </th>
-                <td className="px-6 py-4">
-                  {sede.nombre || 'Sin asignar'}
-                </td>
-                <td className="px-6 py-4">
-                  {sede.principal ? <IoMdCheckboxOutline className='text-znaranja text-lg font-bold' /> : <MdOutlineCheckBoxOutlineBlank className='text-lg font-bold' />}
-                </td>
-                <td className="px-6 py-4">
-                  {sede.empresa?.reporte ? <IoMdCheckboxOutline className='text-znaranja text-lg font-bold' /> : <MdOutlineCheckBoxOutlineBlank className='text-lg font-bold' />}
-                </td>
-                <td className="px-6 py-4">
-                  {sede.reporte ? <IoMdCheckboxOutline className='text-znaranja text-lg font-bold' /> : <MdOutlineCheckBoxOutlineBlank className='text-lg font-bold' />}
-                </td>
-                <td className="px-6 py-4">
-                  {sede.activo ? <IoMdCheckboxOutline className='text-znaranja text-lg font-bold' /> : <MdOutlineCheckBoxOutlineBlank className='text-lg font-bold' />}
-                </td>
-                <td className="px-6 py-4 text-lg flex justify-center items-center gap-4">
-                  <button onClick={() => updateBusiness(sede.empresa?.idEmpresa, sede?.idSede)} className="text-zverde"><PiPencilSimpleLineFill /></button>
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-      <Pagination dataFetch={empresasSedesUsuarios?.sort((a, b) => a.empresa?.nombre.localeCompare(b.empresa?.nombre))} clave={"empresas"} key={1} totalRows={10} setData={setDataRender} />
+      </div>
     </div>
-
   );
 };
 

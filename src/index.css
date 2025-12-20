@@ -22,3 +22,40 @@
       -moz-appearance: textfield;
     }
   }
+/* Estilos personalizados para Sonner */
+.sonner-toast {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Animaciones personalizadas para los toasts */
+[data-sonner-toast] {
+  backdrop-filter: blur(8px);
+}
+
+[data-sonner-toast][data-type="success"] {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background: linear-gradient(135deg, #FF5F3F, #FFB5A6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  background: #80006A !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+[data-sonner-toast][data-type="loading"] {
+  background: linear-gradient(135deg, #A65C99, #D7D7D7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
