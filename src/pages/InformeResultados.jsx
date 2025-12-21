@@ -1,25 +1,19 @@
 import { useEffect, useState } from 'react';
-import {
-  MaterialReactTable,
-  createMRTColumnHelper,
-} from 'material-react-table';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
-import { download, generateCsv, mkConfig } from 'export-to-csv';
-import { Button, Box } from '@mui/material';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { FaFilePdf } from 'react-icons/fa';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
-import { DocumentScannerRounded } from '@mui/icons-material';
 import { toast } from 'sonner';
 import LoadingGenerate from '../components/LoadingGenerate';
+import DataTable from '../components/DataTable';
 
 const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
   const [datos, setDatos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [rowSelection, setRowSelection] = useState({});
-  const [isGenerate, setIsGenerate] = useState(false)
+  const [isGenerate, setIsGenerate] = useState(false);
+  const [clearTableSelection, setClearTableSelection] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +25,9 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
         setDatos(response.data?.informe);
       } catch (error) {
         console.error('Error fetching data:', error.message);
+        toast.error('Error al cargar datos', {
+          description: 'No se pudieron obtener los resultados'
+        });
       } finally {
         setIsLoading(false);
       }
@@ -39,89 +36,45 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
     fetchData();
   }, [idEvaluacion, idEmpresa, changeSelect, idSede]);
 
-  const columnHelper = createMRTColumnHelper();
-
+  // Definir columnas para DataTable
   const columns = [
-    // Configuración de columnas (igual a la anterior)
-    columnHelper.accessor('ID_Evaluador', {
-      header: '# Documento',
-      size: 150,
-    }),
-    columnHelper.accessor('Evaluador', {
-      header: 'Nombre evaluador',
-      size: 250,
-    }),
-    columnHelper.accessor('cargo_evaluador', {
-      header: 'Cargo evaluador',
-      size: 250,
-    }),
-    columnHelper.accessor('empresa_evaluador', {
-      header: 'Empresa',
-      size: 200,
-    }),
-    columnHelper.accessor('ID_Colaborador', {
-      header: '# Documento',
-      size: 200,
-    }),
-    columnHelper.accessor('Colaborador', {
-      header: 'Nombre colaborador',
-      size: 250,
-    }),
-    columnHelper.accessor('cargo', {
-      header: 'Cargo colaborador',
-      size: 250,
-    }),
-    columnHelper.accessor('area', {
-      header: 'Área colaborador',
-      size: 200,
-    }),
-    columnHelper.accessor('fechaIngreso', {
-      header: 'Fecha Ingreso Colaborador',
-      size: 200,
-    }),
-    columnHelper.accessor('Empresa', {
-      header: 'Empresa Colaborador',
-      size: 200,
-    }),
-    columnHelper.accessor('Sede', {
-      header: 'Sede Colaborador',
-      size: 200,
-    }),
-    columnHelper.accessor('AUTOEVALUACION', {
-      header: 'Prom. Autoevaluación',
-      size: 200,
-    }),
-    columnHelper.accessor('EVALUACION', {
-      header: 'Prom. Evaluación',
-      size: 200,
-    }),
+    { field: 'ID_Evaluador', headerName: '# Doc. Evaluador' },
+    { field: 'Evaluador', headerName: 'Nombre Evaluador' },
+    { field: 'cargo_evaluador', headerName: 'Cargo Evaluador' },
+    { field: 'empresa_evaluador', headerName: 'Empresa Evaluador' },
+    { field: 'ID_Colaborador', headerName: '# Doc. Colaborador' },
+    { field: 'Colaborador', headerName: 'Nombre Colaborador' },
+    { field: 'cargo', headerName: 'Cargo Colaborador' },
+    { field: 'area', headerName: 'Área Colaborador' },
+    { field: 'fechaIngreso', headerName: 'Fecha Ingreso' },
+    { field: 'Empresa', headerName: 'Empresa Colaborador' },
+    { field: 'Sede', headerName: 'Sede Colaborador' },
+    { field: 'AUTOEVALUACION', headerName: 'Prom. Autoevaluación' },
+    { field: 'EVALUACION', headerName: 'Prom. Evaluación' },
   ];
 
-  const csvConfig = mkConfig({
-    fieldSeparator: ',',
-    decimalSeparator: '.',
-    useKeysAsHeaders: true,
-  });
-
-  const handleExportData = (data) => {
-    const csv = generateCsv(csvConfig)(data);
-    download(csvConfig)(csv);
+  // Manejar cambios en la selección de filas
+  const handleRowSelectionChange = (selectedData) => {
+    setSelectedRows(selectedData);
   };
 
-  if (isLoading) {
-    return (
-      <Loading />
-    );
-  }
-  if (isGenerate) {
-    return (
-      <LoadingGenerate />
-    );
-  }
+  // Exportar PDFs de usuarios seleccionados
+  const exportPdfs = async () => {
+    if (selectedRows.length === 0) {
+      toast.error('Selección requerida', {
+        description: 'Selecciona al menos un registro para exportar PDF'
+      });
+      return;
+    }
 
-  const exportPdfs = async (dataSelected) => {
-    const idusers = dataSelected.map(item => item.ID_Colaborador);
-    setIsGenerate(true)
+    const idusers = selectedRows.map(item => item.ID_Colaborador);
+    const documentCount = selectedRows.length;
+    setIsGenerate(true);
+
+    // Mostrar toast de inicio
+    toast.info('Iniciando generación de PDFs', {
+      description: `Procesando ${documentCount} ${documentCount === 1 ? 'documento' : 'documentos'}...`
+    });
   
     try {
       const response = await axios.post(
@@ -129,23 +82,19 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
         { idusers, idEvaluacion },
         { 
           withCredentials: true,
-          responseType: 'blob' // Recibe el archivo como un blob
+          responseType: 'blob'
         }
       );
 
-      if (response.data) {
-        setIsGenerate(false)
-      }
-  
       // Obtener el nombre del archivo desde los headers
       const contentDisposition = response.headers["content-disposition"];
-      const timestamp = new Date().toLocaleString('en-CA', { timeZone: 'America/Bogota' }).replace(',', '')
-      let filename = `documents_${timestamp}.zip`; // Nombre por defecto
+      const timestamp = new Date().toLocaleString('en-CA', { timeZone: 'America/Bogota' }).replace(',', '');
+      let filename = `evaluaciones_${timestamp}.zip`;
   
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?([^"]+)"?/);
         if (match && match[1]) {
-          filename = match[1]; // Extrae el nombre real del archivo
+          filename = match[1];
         }
       }
   
@@ -156,65 +105,81 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename; // Usar el nombre obtenido del servidor
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
   
       // Limpiar la URL temporal
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      // Limpiar la selección después de descarga exitosa
+      setSelectedRows([]);
+      setClearTableSelection(true);
+      
+      // Reset el flag de limpieza después de un breve delay
+      setTimeout(() => setClearTableSelection(false), 100);
+      
+      toast.success('PDFs generados exitosamente', {
+        description: `${documentCount} documentos descargados en ${filename}`
+      });
       
     } catch (error) {
       console.error("Error al descargar el ZIP:", error);
-      toast.error("Error al descargar el archivo");
+      toast.error("Error al exportar PDFs", {
+        description: error.response?.data?.message || "No se pudieron generar los documentos"
+      });
+    } finally {
+      setIsGenerate(false);
     }
   };
-  
+
+  // Acciones personalizadas para la tabla
+  const customActions = (
+    <button
+      onClick={exportPdfs}
+      disabled={selectedRows.length === 0 || isGenerate}
+      className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <FaFilePdf className="text-sm" />
+      {isGenerate ? 'Generando...' : `Exportar PDF (${selectedRows.length})`}
+    </button>
+  );
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isGenerate) {
+    return (
+      <LoadingGenerate 
+        message="Generando PDFs de Evaluaciones"
+        subtitle="Estamos procesando las evaluaciones seleccionadas y generando los documentos PDF. Este proceso puede tomar varios minutos."
+        selectedCount={selectedRows.length}
+      />
+    );
+  }
 
   return (
-    <div>
-      <h1 className="text-xl font-bold text-start my-5">
-        Informe de resultados
-      </h1>
-      <MaterialReactTable
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Informe de Resultados
+        </h1>
+        <p className="text-gray-600">
+          Consulta y exporta los resultados de las evaluaciones realizadas
+        </p>
+      </div>
+
+      <DataTable
         columns={columns}
         data={datos}
-        enableColumnResizing
-        enableSorting
-        enablePagination
-        enableRowSelection
-        state={{ rowSelection }}
-        onRowSelectionChange={(updater) => {
-          const newRowSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          setRowSelection(newRowSelection);
-          const selectedData = Object.keys(newRowSelection).map(index => datos[index]);
-          setSelectedRows(selectedData);
-        }}
-        renderTopToolbarCustomActions={() => (
-          <Box
-            sx={{
-              display: 'flex',
-              gap: '16px',
-              padding: '8px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Button
-              onClick={() => handleExportData(datos)}
-              startIcon={<FileDownloadIcon />}
-              color="success"
-            >
-              Exportar todo
-            </Button>
-            <Button
-              onClick={() => exportPdfs(selectedRows)}
-              startIcon={<DocumentScannerRounded />}
-              color="error"
-            >
-              Exportar PDF
-            </Button>
-          </Box>
-        )}
+        enableExcelExport={true}
+        enableRowSelection={true}
+        onRowSelectionChange={handleRowSelectionChange}
+        title="Informe de Resultados"
+        customActions={customActions}
+        clearSelection={clearTableSelection}
       />
     </div>
   );

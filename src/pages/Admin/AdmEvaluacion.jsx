@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { URLBASE } from "../../lib/actions";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { FaPlus, FaTimes, FaClipboardList, FaUsers, FaBuilding, FaEye, FaEdit } from "react-icons/fa";
+import { FaPlus, FaTimes, FaClipboardList, FaUsers, FaBuilding, FaEye } from "react-icons/fa";
 import { PiPencilSimpleLineFill } from "react-icons/pi";
 import { IoEyeSharp } from "react-icons/io5";
 import AsignarEvaluacion from "../../components/AsignarEvaluacion";
+import Loading from "../Loading";
 
 
 const AdmEvaluacion = () => {
@@ -65,17 +66,12 @@ const AdmEvaluacion = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zvioleta mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando evaluaciones...</p>
-        </div>
-      </div>
+      <Loading message="Cargando evaluaciones..." />
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 w-full">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
@@ -109,7 +105,7 @@ const AdmEvaluacion = () => {
                     key={evaluacion.idEvaluacion} 
                     className={`p-3 rounded-lg border cursor-pointer transition-all ${
                       currentEval.idEvaluacion === evaluacion.idEvaluacion 
-                        ? 'bg-purple-50 border-purple-200 shadow-sm' 
+                        ? 'bg-zvioleta/10 border-zvioleta/30 shadow-sm' 
                         : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                     }`}
                     onClick={() => setCurrentEval(evaluacion)}
@@ -124,7 +120,7 @@ const AdmEvaluacion = () => {
                           e.stopPropagation()
                           setShowAsignar(true)
                         }}
-                        className="flex items-center gap-1 bg-znaranja hover:bg-znaranjaclaro text-white px-3 py-1 rounded text-sm transition-colors"
+                        className="flex items-center gap-1 bg-znaranja hover:bg-znaranja/90 text-white px-3 py-1 rounded text-sm transition-colors"
                       >
                         <FaUsers className="text-xs" />
                         Asignar
@@ -154,7 +150,7 @@ const AdmEvaluacion = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                       <input 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                         type="text" 
                         placeholder="Nombre de la competencia"
                       />
@@ -162,14 +158,14 @@ const AdmEvaluacion = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                       <input 
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                         type="text" 
                         placeholder="Descripción"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Competencia</label>
-                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent">
+                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all">
                         <option value="">Seleccione</option>
                         {tipoCompetencias.sort((a, b) => a.nombre.localeCompare(b.nombre)).map(tipo => (
                           <option key={tipo.idTipo} value={tipo.idTipo}>{tipo.nombre}</option>
@@ -178,7 +174,7 @@ const AdmEvaluacion = () => {
                     </div>
                     <button 
                       type="button"
-                      className="bg-zvioleta hover:bg-zvioletaopaco text-white px-4 py-2 rounded-lg transition-colors"
+                      className="bg-zvioleta hover:bg-zvioleta/90 text-white px-4 py-2 rounded-lg transition-colors"
                     >
                       Guardar
                     </button>
@@ -204,12 +200,12 @@ const AdmEvaluacion = () => {
                           <td className="px-6 py-4">{competencia.TipoCompetencium?.nombre}</td>
                           <td className="px-6 py-4">
                             <div className="flex justify-center gap-2">
-                              <button className="text-blue-600 hover:text-blue-800 p-1">
+                              <button className="text-zvioleta hover:text-zvioleta/80 p-1 transition-colors">
                                 <PiPencilSimpleLineFill className="text-lg" />
                               </button>
                               <button 
                                 onClick={() => showModal(competencia)} 
-                                className="text-green-600 hover:text-green-800 p-1"
+                                className="text-znaranja hover:text-znaranja/80 p-1 transition-colors"
                               >
                                 <IoEyeSharp className="text-lg" />
                               </button>
@@ -255,7 +251,7 @@ const AdmEvaluacion = () => {
                     Nombre de la Evaluación
                   </label>
                   <input 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                     type="text" 
                     id="nombre" 
                     placeholder="Ingrese el nombre de la evaluación"
@@ -268,7 +264,7 @@ const AdmEvaluacion = () => {
                     Año
                   </label>
                   <input 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                     type="number" 
                     id="year" 
                     placeholder="2024"
@@ -281,7 +277,7 @@ const AdmEvaluacion = () => {
                     Fecha de Inicio
                   </label>
                   <input 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                     type="date" 
                     id="fechaInicio" 
                     {...register("fechaInicio", { required: true })} 
@@ -293,7 +289,7 @@ const AdmEvaluacion = () => {
                     Fecha de Fin
                   </label>
                   <input 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                     type="date" 
                     id="fechaFin" 
                     {...register("fechaFin", { required: true })} 
@@ -303,7 +299,7 @@ const AdmEvaluacion = () => {
                 <div className="flex items-center">
                   <div className="flex items-center h-full">
                     <input 
-                      className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioletaopaco" 
+                      className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
                       type="checkbox" 
                       id="estado"
                       defaultChecked={true} 
@@ -320,7 +316,7 @@ const AdmEvaluacion = () => {
                     Objetivo de la Evaluación
                   </label>
                   <textarea 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioletaopaco focus:border-transparent" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
                     id="objetivo" 
                     rows="3"
                     placeholder="Describe el objetivo de esta evaluación..."
@@ -338,7 +334,7 @@ const AdmEvaluacion = () => {
                   </button>
                   <button 
                     type="submit"
-                    className="px-6 py-2 bg-zvioleta hover:bg-purple-700 text-white rounded-lg transition-colors"
+                    className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                   >
                     Crear Evaluación
                   </button>
@@ -379,7 +375,7 @@ const AdmEvaluacion = () => {
                       <div key={empresa?.idEmpresa} className="flex items-center gap-2 p-2 bg-white rounded border">
                         <input 
                           type="checkbox" 
-                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioletaopaco" 
+                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
                           onChange={() => console.log(empresa)} 
                         />
                         <label className="text-sm text-gray-700">{empresa.nombre}</label>
@@ -392,7 +388,7 @@ const AdmEvaluacion = () => {
                 <div className="flex flex-col justify-center items-center gap-4">
                   <button 
                     type="button" 
-                    className="bg-zvioleta hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    className="bg-zvioleta hover:bg-zvioleta/90 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Asignar →
                   </button>
@@ -407,7 +403,7 @@ const AdmEvaluacion = () => {
                 {/* Assigned Companies */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                    <FaBuilding className="text-green-600" />
+                    <FaBuilding className="text-zvioleta" />
                     Empresas Asignadas
                   </h3>
                   <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -415,7 +411,7 @@ const AdmEvaluacion = () => {
                       <div key={empresa.idEmpresa} className="flex items-center gap-2 p-2 bg-white rounded border">
                         <input 
                           type="checkbox" 
-                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioletaopaco" 
+                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
                           onChange={() => setEmpresasAsignadas(prev => 
                             prev.filter(e => e.idEmpresa !== empresa.idEmpresa)
                           )} 
@@ -437,7 +433,7 @@ const AdmEvaluacion = () => {
                 </button>
                 <button 
                   type="button" 
-                  className="px-6 py-2 bg-zvioleta hover:bg-purple-700 text-white rounded-lg transition-colors"
+                  className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                 >
                   Guardar Cambios
                 </button>

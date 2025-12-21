@@ -131,8 +131,22 @@ const InformeDetalleGrupo = () => {
                     </div>
                 </div>
 
-                {/* Results */}
-                {datos.length > 0 && (
+                {/* Results or Empty States */}
+                {!hasSearched && !isLoading ? (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                        <div className="text-gray-400 mb-4">
+                            <FaSearch size={48} className="mx-auto" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Selecciona una evaluación</h3>
+                        <p className="text-gray-600 mb-4">
+                            Para ver el detalle de las evaluaciones de tu equipo, selecciona una evaluación y haz clic en "Consultar".
+                        </p>
+                        <div className="inline-flex items-center gap-2 text-sm text-zvioleta bg-zvioleta/10 px-3 py-2 rounded-lg">
+                            <FaUsers size={14} />
+                            <span>Información de tu equipo</span>
+                        </div>
+                    </div>
+                ) : datos.length > 0 ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                         <div className="flex items-center gap-3 mb-4">
                             <FaFileAlt className="text-gray-500" size={20} />
@@ -150,18 +164,20 @@ const InformeDetalleGrupo = () => {
                             title="Informe Detalle Grupo"
                         />
                     </div>
-                )}
-
-                {/* Empty State */}
-                {!isLoading && hasSearched && datos.length === 0 && (
+                ) : hasSearched && !isLoading ? (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                        <FaFileAlt className="mx-auto text-gray-400 mb-4" size={48} />
+                        <div className="text-gray-400 mb-4">
+                            <FaFileAlt size={48} className="mx-auto" />
+                        </div>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No hay datos disponibles</h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 mb-4">
                             No se encontraron registros para la evaluación seleccionada.
                         </p>
+                        <p className="text-sm text-gray-500">
+                            Intenta seleccionar una evaluación diferente o verifica que tu equipo haya completado evaluaciones.
+                        </p>
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
     );

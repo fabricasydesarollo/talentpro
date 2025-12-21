@@ -135,17 +135,36 @@ const InformesGraficas = () => {
       </div>
       {
         cubrimiento.length == 0 && !isLoading ? (
-          <p className="text-center text-znaranja">*Seleccione una evaluación para ver las gráficas.*</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <div className="text-gray-400 mb-4">
+              <FaSearch size={48} className="mx-auto" />
+            </div>
+            <p className="text-lg text-gray-600 mb-2">No hay datos disponibles</p>
+            <p className="text-sm text-gray-700">Seleccione una evaluación para ver las gráficas</p>
+          </div>
         ) : isLoading ? (
           <Loading />
         ) : (
-          <div className="flex flex-col justify-center">
-            <div className='flex shadow-lg bg-slate-100 rounded-md mb-4 justify-around'>
-              <PieChartCumplimiento data={dataPieEvaluacion} nombre='Avance Zentria Evaluación' />
-              <PieChartCumplimiento data={dataPieAutoevaluacion} nombre='Avance Zentria Autoevaluación' />
+          <div className="space-y-6">
+            {/* Charts Container */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Avance de Evaluaciones</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <PieChartCumplimiento data={dataPieEvaluacion} nombre='Avance Zentria Evaluación' />
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <PieChartCumplimiento data={dataPieAutoevaluacion} nombre='Avance Zentria Autoevaluación' />
+                </div>
+              </div>
             </div>
-            <div className="shadow-lg rounded-md bg-slate-100 min-h-screen">
-              <BarChartAdvance data={cubrimiento?.totalUsuariosEmpresa} nombre={'Empresas'} setEmpresa={setEmpresa} setOpenModal={setOpenModal} />
+            
+            {/* Bar Chart Container */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Avance por Empresas</h3>
+              <div className="bg-gray-50 rounded-lg p-4 min-h-[500px]">
+                <BarChartAdvance data={cubrimiento?.totalUsuariosEmpresa} nombre={'Empresas'} setEmpresa={setEmpresa} setOpenModal={setOpenModal} />
+              </div>
             </div>
           </div>
         )
