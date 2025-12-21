@@ -2,10 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { URLBASE } from "../lib/actions";
 import { normalizarData } from "../lib/utils";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import { LuSave } from "react-icons/lu";
-import { toast } from "react-toastify";
-import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
+import { FaTimes, FaSave, FaUsers, FaBuilding, FaSearch, FaChevronLeft, FaChevronRight, FaChevronDown } from "react-icons/fa";
+import { toast } from "sonner";
 
 const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
 
@@ -14,24 +12,35 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
   const [empresas, setEmpresas] = useState([])
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([])
   const [usuariosNormalizados, setUsuariosNormalizados] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [filtroEmpresa, setFiltroEmpresa] = useState('')
+  const [filtroNombre, setFiltroNombre] = useState('')
 
   useEffect(() => {
     const fechData = async () => {
-      const [usuariosRes, evaluacionesRes] = await Promise.all([
-        axios.get(`${URLBASE}/usuarios/obtenerListaUsuarios`),
-        axios.get(`${URLBASE}/evaluaciones/obtenerEvaluacionesAsignadas`, {
-          params: {
-            idEvaluacion: idEvaluacion
-          }
+      try {
+        setIsLoading(true)
+        const [usuariosRes, evaluacionesRes] = await Promise.all([
+          axios.get(`${URLBASE}/usuarios/obtenerListaUsuarios`),
+          axios.get(`${URLBASE}/evaluaciones/obtenerEvaluacionesAsignadas`, {
+            params: {
+              idEvaluacion: idEvaluacion
+            }
+          })
+        ])
+        setUsuarios(usuariosRes.data?.resultados)
+        setEvaluaciones(evaluacionesRes.data?.resultados)
+      } catch (error) {
+        toast.error('Error al cargar datos', {
+          description: 'No se pudieron obtener los usuarios'
         })
-      ])
-      setUsuarios(usuariosRes.data?.resultados)
-      setEvaluaciones(evaluacionesRes.data?.resultados)
-
+      } finally {
+        setIsLoading(false)
+      }
     }
     fechData()
-  }, [])
-
+  }, [idEvaluacion])
 
   useEffect(() => {
     const empresasMap = new Map();
@@ -48,37 +57,42 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
   }, [usuarios]);
 
   useEffect(() => {
-    setUsuariosNormalizados(normalizarData(usuarios, evaluaciones));
-    setUsuariosFiltrados(usuariosNormalizados);
-  }, [usuarios, evaluaciones]);
+    const normalized = normalizarData(usuarios, evaluaciones);
+    setUsuariosNormalizados(normalized);
+    // Apply current filters to the normalized data
+    aplicarFiltros(normalized, filtroEmpresa, filtroNombre);
+  }, [usuarios, evaluaciones, filtroEmpresa, filtroNombre]);
 
+  function aplicarFiltros(usuarios, empresa, nombre) {
+    let filtrados = usuarios;
 
-  function filtrarUsuariosEmpresas(idEmpresa) {
-    if (idEmpresa === '') {
-      setUsuariosFiltrados(usuariosNormalizados);
-    } else {
-      const filtrados = usuariosNormalizados.filter(user => user.idEmpresa == idEmpresa);
-      setUsuariosFiltrados(filtrados);
+    // Filtrar por empresa
+    if (empresa !== '') {
+      filtrados = filtrados.filter(user => user.idEmpresa == empresa);
     }
+
+    // Filtrar por nombre o documento
+    if (nombre !== '') {
+      filtrados = filtrados.filter(user =>
+        user.nombre.toLowerCase().includes(nombre.toLowerCase()) ||
+        user.idUsuario.toString().includes(nombre)
+      );
+    }
+
+    setUsuariosFiltrados(filtrados);
+    setCurrentPage(1);
   }
 
+  function filtrarUsuariosEmpresas(idEmpresa) {
+    setFiltroEmpresa(idEmpresa);
+    // Reset to first page when filter changes
+    setCurrentPage(1);
+  }
 
   function filtrarUsuariosNombre(nombre) {
-    if (nombre === '') {
-      setUsuariosFiltrados(usuariosNormalizados);
-    } else {
-      const filtrados = usuariosFiltrados.filter(user =>
-        user.nombre.toLowerCase().includes(nombre.toLowerCase())
-      );
-      if (filtrados.length === 0) {
-        const filtroDocumento = usuariosNormalizados.filter(user =>
-          user.idUsuario.toString().includes(nombre)
-        );
-        setUsuariosFiltrados(filtroDocumento);
-        return;
-      }
-      setUsuariosFiltrados(filtrados);
-    }
+    setFiltroNombre(nombre);
+    // Reset to first page when filter changes
+    setCurrentPage(1);
   }
 
   const [pageSize, setPageSize] = useState(15);
@@ -88,8 +102,6 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
-
 
   function toggleSeleccionarTodosEvaluacion(checked) {
     setUsuariosFiltrados(prev =>
@@ -111,7 +123,8 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     return sublistas;
   }
 
-  function handleGuardarAsignacion() {
+  async function handleGuardarAsignacion() {
+    setIsSaving(true);
     const ListaAsignar = usuariosFiltrados.map(u => ({
       idUsuario: u.idUsuario,
       evaluacion: u.evaluacion,
@@ -121,174 +134,307 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
 
     const sublistas = dividirLista(ListaAsignar, 100);
 
-    // Mostrar toast de carga y guardar su id
-    const toastId = toast.loading('Asignando evaluaciones, por favor espere...');
-
-    Promise.all(
-      sublistas.map(sublista =>
-        axios.post(`${URLBASE}/evaluaciones/asignarEvaluaciones`, {
-          ListaAsignar: sublista
-        })
-      )
-    )
-      .then(() => {
-        toast.update(toastId, {
-          render: 'Asignaciones guardadas con éxito',
-          type: 'success',
-          isLoading: false,
-          autoClose: 3000
-        });
-      })
-      .catch(() => {
-        toast.update(toastId, {
-          render: 'Error al guardar las asignaciones',
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000
-        });
+    try {
+      await Promise.all(
+        sublistas.map(sublista =>
+          axios.post(`${URLBASE}/evaluaciones/asignarEvaluaciones`, {
+            ListaAsignar: sublista
+          })
+        )
+      );
+      
+      toast.success('Asignaciones guardadas', {
+        description: 'Las evaluaciones se asignaron correctamente'
       });
+      
+      setShowAsignar(false);
+    } catch (error) {
+      toast.error('Error al guardar', {
+        description: 'No se pudieron guardar las asignaciones'
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }
 
+  const selectedCount = usuariosFiltrados.filter(u => u.evaluacion || u.autoevaluacion).length;
 
   return (
-    <div className="fixed bg-black inset-0 bg-opacity-50 flex justify-center items-center overflow-auto">
-      <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-screen overflow-y-auto relative">
-        <button onClick={() => setShowAsignar(false)} className="absolute top-4 right-4 text-white px-4 py-2 rounded-lg bg-znaranja shadow-md shadow-znaranja hover:scale-105 text-md active:scale-95 transition-transform duration-300"><IoIosCloseCircleOutline /></button>
-        <button
-          onClick={handleGuardarAsignacion}
-          className="absolute top-4 right-20 text-white px-4 py-2 rounded-lg bg-zvioleta shadow-md shadow-zvioleta hover:scale-105 text-md active:scale-95 transition-transform duration-300"><LuSave />
-        </button>
-        <h1 className="text-znaranja text-2xl text-center font-semibold py-3">Asignar evaluación a usuarios</h1>
-
-        {/* Filtros */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex flex-col">
-            <label htmlFor="empresa" className="text-sm font-medium">Filtrar por empresa</label>
-            <select
-              onChange={(e) => filtrarUsuariosEmpresas(e.target.value)}
-              id="empresa"
-              className="border border-gray-300 rounded-md w-full p-2 text-gray-500 focus:outline-none focus:ring-1 focus:ring-zvioleta focus:border-zvioleta">
-              <option value="">Todos</option>
-              {
-                empresas?.map(empresa => (
-                  <option key={empresa.idEmpresa} value={empresa.idEmpresa}>{empresa?.nombre}</option>
-                ))
-              }
-            </select>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="usuario" className="text-sm font-medium"
-            >Filtrar por usuarios</label>
-            <input type="text" id="usuario" placeholder="Buscar por usuario" className="border border-gray-300 rounded-md w-full p-2 text-gray-500 focus:outline-none focus:ring-1 focus:ring-zvioleta focus:border-zvioleta" onChange={(e) => filtrarUsuariosNombre(e.target.value)} />
-          </div>
-          <div className="flex justify-around items-center gap-4">
-            <div className="flex flex-col items-center">
-              <label htmlFor="evaluacion-all" className="text-sm">Evaluación</label>
-              <input type="checkbox" id="evaluacion-all" className="mt-1 border-gray-400 rounded-md"
-                defaultChecked={false}
-                onClick={(e) => toggleSeleccionarTodosEvaluacion(e.target.checked)} />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-7xl max-h-[95vh] overflow-hidden shadow-2xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-zvioleta to-zvioletaopaco text-white p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FaUsers className="text-2xl" />
+              <div>
+                <h1 className="text-2xl font-bold">Asignar Evaluación</h1>
+                <p className="text-white/90 text-sm">Selecciona usuarios para asignar evaluaciones</p>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <label htmlFor="autoevaluacion-all" className="text-sm">Autoevaluación</label>
-              <input type="checkbox" id="autoevaluacion-all" className="mt-1 border-gray-400 rounded-md"
-                defaultChecked={false}
-                onClick={(e) => toggleSeleccionarTodosAutoEvaluacion(e.target.checked)} />
+            <div className="flex items-center gap-3">
+              {selectedCount > 0 && (
+                <div className="bg-white/20 px-3 py-1 rounded-lg text-sm">
+                  {selectedCount} seleccionados
+                </div>
+              )}
+              <button
+                onClick={handleGuardarAsignacion}
+                disabled={isSaving || selectedCount === 0}
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FaSave className="text-sm" />
+                {isSaving ? 'Guardando...' : 'Guardar'}
+              </button>
+              <button
+                onClick={() => setShowAsignar(false)}
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <FaTimes className="text-sm" />
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Tabla de usuarios */}
-        <div className="overflow-x-auto border border-gray-300 rounded-md">
-          <table className="min-w-full text-sm text-gray-700 relative">
-            <thead className="bg-gray-100">
-              <tr>
-                <th scope="col" className="px-4 py-2 text-left"># Documento</th>
-                <th scope="col" className="px-4 py-2 text-left">Nombre</th>
-                <th scope="col" className="px-4 py-2 text-left">Empresa</th>
-                <th scope="col" className="px-4 py-2 text-center">Evaluación</th>
-                <th scope="col" className="px-4 py-2 text-center">Autoevaluación</th>
-              </tr>
-            </thead>
-            {
-              usuariosFiltrados.length > 0 ? (
-                <tbody className="text-gray-500">
-                  {
-                    paginatedData?.map((user, idx) => (
-                      <tr className="border-t" key={idx}>
-                        <td className="px-4 py-2">{user.idUsuario}</td>
-                        <td className="px-4 py-2">{user.nombre}</td>
-                        <td className="px-4 py-2">{user.empresa || '-'}</td>
-                        <td className="px-4 py-2 text-center">
-                          <input
-                            type="checkbox"
-                            name="evaluacion"
-                            checked={user?.evaluacion}
-                            onChange={(e) => {
-                              setUsuariosFiltrados(prev =>
-                                prev.map(u =>
-                                  u.idUsuario === user.idUsuario ? { ...u, evaluacion: e.target.checked } : u
-                                )
-                              );
-                            }}
-                            className="rounded-md border-gray-400"
-                          />
-                        </td>
-                        <td className="px-4 py-2 text-center">
-                          <input
-                            type="checkbox"
-                            name="autoevaluacion"
-                            checked={user?.autoevaluacion}
-                            onChange={(e) => {
-                              setUsuariosFiltrados(prev =>
-                                prev.map(u =>
-                                  u.idUsuario === user.idUsuario ? { ...u, autoevaluacion: e.target.checked } : u
-                                )
-                              );
-                            }}
-                            className="rounded-md border-gray-400"
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              ) : (
-                <div className="w-full h-full flex justify-center items-center bg-white absolute bottom-0 left-0">
-                  <p className="text-center p-4 text-gray-500 text-2xl">Cargando datos, por favor espere...</p>
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
+          {/* Filters */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <FaSearch className="text-zvioleta" />
+                Filtros
+              </h3>
+              {(filtroEmpresa !== '' || filtroNombre !== '') && (
+                <button
+                  onClick={() => {
+                    setFiltroEmpresa('');
+                    setFiltroNombre('');
+                  }}
+                  className="text-sm text-zvioleta hover:text-zvioletaopaco transition-colors"
+                >
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label htmlFor="empresa" className="block text-sm font-medium text-gray-700 mb-1">
+                  Empresa {filtroEmpresa !== '' && <span className="text-zvioleta">•</span>}
+                </label>
+                <div className="relative">
+                  <FaBuilding className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                  <select
+                    onChange={(e) => filtrarUsuariosEmpresas(e.target.value)}
+                    id="empresa"
+                    value={filtroEmpresa}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${
+                      filtroEmpresa !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Todas las empresas</option>
+                    {empresas?.map(empresa => (
+                      <option key={empresa.idEmpresa} value={empresa.idEmpresa}>
+                        {empresa?.nombre}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              )
-            }
-          </table>
-          {totalPages >= 1 && (
-                  <div className="flex justify-center items-center p-4 gap-4 border-t border-gray-200 flex-wrap">
-                    <button
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                    >
-                      <IoChevronBackSharp />
-                    </button>
-                    <span className="text-sm text-gray-600">
-                      {currentPage} de {totalPages}
-                    </span>
-                    <button
-                      className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-300 text-gray-600 disabled:opacity-50"
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                    >
-                      <IoChevronForwardSharp />
-                    </button>
-                      <select id="pageSize" className="border border-gray-300 rounded-lg cursor-pointer text-sm pr-6  text-gray-600 focus:outline-none focus:ring-1 focus:ring-zcinza focus:border-zcinza px-3 py-2" 
-                        onChange={(e) => {
-                        setCurrentPage(1);
-                        setPageSize(Number(e.target.value));
-                      }} value={pageSize}>
-                        <option value="15">15</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                      </select>
+              </div>
+              
+              <div>
+                <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-1">
+                  Usuario {filtroNombre !== '' && <span className="text-zvioleta">•</span>}
+                </label>
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                  <input
+                    type="text"
+                    id="usuario"
+                    placeholder="Buscar por nombre o documento"
+                    value={filtroNombre}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${
+                      filtroNombre !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
+                    }`}
+                    onChange={(e) => filtrarUsuariosNombre(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-end gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="evaluacion-all"
+                    className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50"
+                    onChange={(e) => toggleSeleccionarTodosEvaluacion(e.target.checked)}
+                  />
+                  <label htmlFor="evaluacion-all" className="text-sm font-medium text-gray-700">
+                    Seleccionar todas las evaluaciones
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-end gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="autoevaluacion-all"
+                    className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50"
+                    onChange={(e) => toggleSeleccionarTodosAutoEvaluacion(e.target.checked)}
+                  />
+                  <label htmlFor="autoevaluacion-all" className="text-sm font-medium text-gray-700">
+                    Seleccionar todas las autoevaluaciones
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zvioleta"></div>
+              <span className="ml-3 text-gray-600">Cargando usuarios...</span>
+            </div>
+          ) : (
+            <>
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-3 text-left font-medium text-gray-900">Documento</th>
+                        <th className="px-6 py-3 text-left font-medium text-gray-900">Nombre</th>
+                        <th className="px-6 py-3 text-left font-medium text-gray-900">Empresa</th>
+                        <th className="px-6 py-3 text-center font-medium text-gray-900">Evaluación</th>
+                        <th className="px-6 py-3 text-center font-medium text-gray-900">Autoevaluación</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {paginatedData?.map((user, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 font-medium text-gray-900">{user.idUsuario}</td>
+                          <td className="px-6 py-4 text-gray-700">{user.nombre}</td>
+                          <td className="px-6 py-4 text-gray-700">{user.empresa || '-'}</td>
+                          <td className="px-6 py-4 text-center">
+                            <input
+                              type="checkbox"
+                              checked={user?.evaluacion}
+                              onChange={(e) => {
+                                setUsuariosFiltrados(prev =>
+                                  prev.map(u =>
+                                    u.idUsuario === user.idUsuario ? { ...u, evaluacion: e.target.checked } : u
+                                  )
+                                );
+                              }}
+                              className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50"
+                            />
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <input
+                              type="checkbox"
+                              checked={user?.autoevaluacion}
+                              onChange={(e) => {
+                                setUsuariosFiltrados(prev =>
+                                  prev.map(u =>
+                                    u.idUsuario === user.idUsuario ? { ...u, autoevaluacion: e.target.checked } : u
+                                  )
+                                );
+                              }}
+                              className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-700">
+                          Mostrando {((currentPage - 1) * pageSize) + 1} a {Math.min(currentPage * pageSize, usuariosFiltrados.length)} de {usuariosFiltrados.length} usuarios
+                          {(filtroEmpresa !== '' || filtroNombre !== '') && (
+                            <span className="text-zvioleta"> (filtrados de {usuariosNormalizados.length})</span>
+                          )}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <label htmlFor="pageSize" className="text-sm text-gray-700">Por página:</label>
+                          <select
+                            id="pageSize"
+                            value={pageSize}
+                            onChange={(e) => {
+                              setCurrentPage(1);
+                              setPageSize(Number(e.target.value));
+                            }}
+                            className="appearance-none border border-gray-300 rounded px-3 py-1 pr-8 text-sm focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta bg-white cursor-pointer"
+                          >
+                            <option value="15">15</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                          </select>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            className="p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <FaChevronLeft className="text-sm" />
+                          </button>
+                          
+                          <span className="text-sm text-gray-700 px-3">
+                            {currentPage} de {totalPages}
+                          </span>
+                          
+                          <button
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            className="p-2 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <FaChevronRight className="text-sm" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
+              </div>
+
+              {usuariosFiltrados.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <FaUsers className="text-gray-300 text-6xl mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron usuarios</h3>
+                  <p className="text-gray-500">
+                    {filtroEmpresa !== '' || filtroNombre !== '' 
+                      ? 'Intenta ajustar los filtros de búsqueda' 
+                      : 'No hay usuarios disponibles'
+                    }
+                  </p>
+                  {(filtroEmpresa !== '' || filtroNombre !== '') && (
+                    <button
+                      onClick={() => {
+                        setFiltroEmpresa('');
+                        setFiltroNombre('');
+                      }}
+                      className="mt-3 text-zvioleta hover:text-zvioletaopaco transition-colors text-sm"
+                    >
+                      Limpiar filtros
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

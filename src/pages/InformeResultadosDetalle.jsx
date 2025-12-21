@@ -1,34 +1,31 @@
 import { useEffect, useState } from 'react';
-import {
-    MaterialReactTable,
-    createMRTColumnHelper,
-} from 'material-react-table';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
-import { download, generateCsv, mkConfig } from 'export-to-csv';
-import { Button, Box } from '@mui/material';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
+import { toast } from 'sonner';
+import DataTable from '../components/DataTable';
 
 const InformeResultadosDetalle = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
 
     const [datos, setDatos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const user = useUser()
-
+    const user = useUser();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true)
+                setIsLoading(true);
                 const [informeRes] = await Promise.all([
                     axios.get(`${URLBASE}/informes/resultados/detalle`, { params: { idEmpresa, idEvaluacion, idSede }})
-                ])
-                setDatos(informeRes.data.informe || [])
+                ]);
+                setDatos(informeRes.data.informe || []);
             } catch (error) {
                 console.error('Error fetching data:', error.message);
+                toast.error('Error al cargar datos', {
+                    description: 'No se pudieron obtener los resultados detallados'
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -37,115 +34,46 @@ const InformeResultadosDetalle = ({idEvaluacion, idEmpresa, idSede, changeSelect
         fetchData();
     }, [user?.user?.idUsuario, idEmpresa, idSede, idEvaluacion, changeSelect]);
 
-    const columnHelper = createMRTColumnHelper();
-
+    // Definir columnas para DataTable
     const columns = [
-        // Configuración de columnas (igual a la anterior)
-        columnHelper.accessor('tipo', {
-            header: 'Tipo',
-            size: 200,
-        }),
-        columnHelper.accessor('ID_Evaluador', {
-            header: '# Documento evaluador',
-            size: 200,
-        }),
-        columnHelper.accessor('Evaluador', {
-            header: 'Nombre evaluador',
-            size: 200,
-        }),
-        columnHelper.accessor('cargo_evaluador', {
-            header: 'Cargo Evaluador',
-            size: 200,
-        }),
-        columnHelper.accessor('empresa_evaluador', {
-            header: 'Empresa evaluador',
-            size: 200,
-        }),
-        columnHelper.accessor('ID_Colaborador', {
-            header: '# Documento',
-            size: 200,
-        }),
-        columnHelper.accessor('Colaborador', {
-            header: 'Nombre Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('cargo', {
-            header: 'Cargo Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('area', {
-            header: 'Área Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('fechaIngreso', {
-            header: 'Fecha Ingreso Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('Empresa', {
-            header: 'Empresa Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('Sede', {
-            header: 'Sede Colaborador',
-            size: 200,
-        }),
-        columnHelper.accessor('Competencia', {
-            header: 'Competencia',
-            size: 200,
-        }),
-        columnHelper.accessor('promedio', {
-            header: 'Promedio competencia',
-            size: 200,
-        })
+        { field: 'tipo', headerName: 'Tipo' },
+        { field: 'ID_Evaluador', headerName: '# Doc. Evaluador' },
+        { field: 'Evaluador', headerName: 'Nombre Evaluador' },
+        { field: 'cargo_evaluador', headerName: 'Cargo Evaluador' },
+        { field: 'empresa_evaluador', headerName: 'Empresa Evaluador' },
+        { field: 'ID_Colaborador', headerName: '# Doc. Colaborador' },
+        { field: 'Colaborador', headerName: 'Nombre Colaborador' },
+        { field: 'cargo', headerName: 'Cargo Colaborador' },
+        { field: 'area', headerName: 'Área Colaborador' },
+        { field: 'fechaIngreso', headerName: 'Fecha Ingreso' },
+        { field: 'Empresa', headerName: 'Empresa Colaborador' },
+        { field: 'Sede', headerName: 'Sede Colaborador' },
+        { field: 'Competencia', headerName: 'Competencia' },
+        { field: 'promedio', headerName: 'Promedio Competencia' },
     ];
-
-    const csvConfig = mkConfig({
-        fieldSeparator: ',',
-        decimalSeparator: '.',
-        useKeysAsHeaders: true,
-    });
-
-    const handleExportData = (data) => {
-        const csv = generateCsv(csvConfig)(data);
-        download(csvConfig)(csv);
-    };
 
 
     if (isLoading) {
-        return (
-            <Loading />
-        );
+        return <Loading />;
     }
 
     return (
-        <div>
-            <h1 className="text-xl font-bold text-start my-5">
-                Informe de Evaluadores y Colaboradores Detalle
-            </h1>
-            <MaterialReactTable
+        <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                    Informe Detallado por Competencias
+                </h1>
+                <p className="text-gray-600">
+                    Consulta detallada de evaluaciones por competencia y colaborador
+                </p>
+            </div>
+
+            <DataTable
                 columns={columns}
                 data={datos}
-                enableColumnResizing
-                enableSorting
-                enablePagination
-                renderTopToolbarCustomActions={() => (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            gap: '16px',
-                            padding: '8px',
-                            flexWrap: 'wrap',
-                        }}
-                    >
-                        <Button
-                            onClick={() => handleExportData(datos)}
-                            startIcon={<FileDownloadIcon />}
-                            color="success"
-                        >
-                            Exportar todo
-                        </Button>
-                    </Box>
-                )}
+                enableExcelExport={true}
+                enableRowSelection={false}
+                title="Informe Detallado por Competencias"
             />
         </div>
     );

@@ -1,15 +1,16 @@
-import axios from "axios"
-import { useEffect, useState } from "react"
-import { URLBASE } from "../../lib/actions"
-import { useForm } from "react-hook-form"
-import { toast } from "react-toastify"
-import { PiPencilSimpleLineFill } from "react-icons/pi"
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { URLBASE } from "../../lib/actions";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { FaPlus, FaTimes, FaClipboardList, FaUsers, FaBuilding, FaEye } from "react-icons/fa";
+import { PiPencilSimpleLineFill } from "react-icons/pi";
 import { IoEyeSharp } from "react-icons/io5";
-import AsignarEvaluacion from "../../components/AsignarEvaluacion"
+import AsignarEvaluacion from "../../components/AsignarEvaluacion";
+import Loading from "../Loading";
 
 
 const AdmEvaluacion = () => {
-
   const [evaluaciones, setEvaluaciones] = useState([])
   const [tipoCompetencias, setTipoCompetencias] = useState([])
   const [empresas, setEmpresas] = useState([])
@@ -17,37 +18,45 @@ const AdmEvaluacion = () => {
   const [viewModal, setViewModal] = useState(false)
   const [detalleCompetencia, setDetalleCompetencia] = useState({})
   const [currentEval, setCurrentEval] = useState({})
-  const [setEmpresasAsignadas, setSetEmpresasAsignadas] = useState([])
+  const [empresasAsignadas, setEmpresasAsignadas] = useState([])
   const { register, handleSubmit, reset } = useForm()
   const [showAsignar, setShowAsignar] = useState(false)
+  const [openEval, setOpenEval] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-
-    const fecthAllInfo = async () => {
-
-      const [evaluacionesData, tiposData, empresasData] = await Promise.all([
-        axios.get(`${URLBASE}/evaluaciones/gestionar`),
-        axios.get(`${URLBASE}/competencias/tipo`),
-        axios.get(`${URLBASE}/empresas`),
-      ])
-      setEvaluaciones(evaluacionesData.data?.data)
-      setTipoCompetencias(tiposData.data?.data)
-      setEmpresas(empresasData.data?.data)
+    const fetchAllInfo = async () => {
+      try {
+        setLoading(true)
+        const [evaluacionesData, tiposData, empresasData] = await Promise.all([
+          axios.get(`${URLBASE}/evaluaciones/gestionar`),
+          axios.get(`${URLBASE}/competencias/tipo`),
+          axios.get(`${URLBASE}/empresas`),
+        ])
+        setEvaluaciones(evaluacionesData.data?.data)
+        setTipoCompetencias(tiposData.data?.data)
+        setEmpresas(empresasData.data?.data)
+      } catch (error) {
+        toast.error('Error al cargar los datos')
+      } finally {
+        setLoading(false)
+      }
     }
 
-    fecthAllInfo()
-
+    fetchAllInfo()
   }, [refreshData])
 
 
-  const createEvaluacion = (data) => {
-    axios.post(`${URLBASE}/evaluaciones/gestionar`, data)
-      .then(res => {
-        toast.success(`${res.data.message}, Finalizado con exito!`)
-        reset({ nombre: "", año: "", estado: "" })
-        setRefreshData(!refreshData)
-      })
-      .catch(err => toast.error(err.response.data.message))
+  const createEvaluacion = async (data) => {
+    try {
+      const res = await axios.post(`${URLBASE}/evaluaciones/gestionar`, data)
+      toast.success(`${res.data.message}, Finalizado con éxito!`)
+      reset({ nombre: "", año: "", estado: "" })
+      setRefreshData(!refreshData)
+      setOpenEval(false)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al crear evaluación')
+    }
   }
 
   const showModal = (competencia) => {
@@ -55,189 +64,392 @@ const AdmEvaluacion = () => {
     setDetalleCompetencia(competencia)
   }
 
-  const selcEmpresas = []
-
-  const [openEval, setOpenEval] = useState(false)
+  if (loading) {
+    return (
+      <Loading message="Cargando evaluaciones..." />
+    )
+  }
 
   return (
-    <div className="flex flex-col mx-auto text-sm w-full px-36 justify-center items-center relative">
-      <h1 className="text-zvioleta text-4xl font-bold my-6">Administrar evaluaciones</h1>
-      <button className="bg-zvioleta text-white px-4 py-2 rounded-md" onClick={() => setOpenEval(!openEval)}>Crear Evaluación</button>
-      {
-        openEval && (
-          <div className="fixed bg-black inset-0 bg-opacity-50 flex justify-center items-center overflow-auto">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto relative">
-              <h2 className="text-2xl font-semibold text-zvioleta mb-4">Crear nueva evaluación</h2>
-              <button onClick={() => setOpenEval(false)} className="absolute top-2 right-2 text-zvioleta text-2xl font-bold">&times;</button>
-              <form className="grid gap-5 w-full justify-between grid-cols-3" onSubmit={handleSubmit(createEvaluacion)}>
-                <div className="w-full col-span-2">
-                  <label htmlFor="nombre" className="text-gray-700">Nombre</label>
-                  <input className="input-custom" type="text" id="nombre" {...register("nombre")} />
+    <div className="min-h-screen bg-gray-50 p-6 w-full">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FaClipboardList className="text-zvioleta text-2xl" />
+              <h1 className="text-2xl font-bold text-gray-900">Administrar Evaluaciones</h1>
+            </div>
+            <button 
+              onClick={() => setOpenEval(true)}
+              className="flex items-center gap-2 bg-zvioleta hover:bg-zvioletaopaco text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <FaPlus className="text-sm" />
+              Crear Evaluación
+            </button>
+          </div>
+        </div>
+
+        {/* Evaluaciones List */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel - Evaluaciones */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FaClipboardList className="text-zvioleta" />
+                Evaluaciones
+              </h2>
+              <div className="space-y-2">
+                {evaluaciones.map(evaluacion => (
+                  <div 
+                    key={evaluacion.idEvaluacion} 
+                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                      currentEval.idEvaluacion === evaluacion.idEvaluacion 
+                        ? 'bg-zvioleta/10 border-zvioleta/30 shadow-sm' 
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    }`}
+                    onClick={() => setCurrentEval(evaluacion)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium text-gray-900">{evaluacion.nombre}</p>
+                        <p className="text-sm text-gray-500">Año {evaluacion.year}</p>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowAsignar(true)
+                        }}
+                        className="flex items-center gap-1 bg-znaranja hover:bg-znaranja/90 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        <FaUsers className="text-xs" />
+                        Asignar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Competencias */}
+          <div className="lg:col-span-2">
+            {currentEval.idEvaluacion ? (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <FaBuilding className="text-zvioleta" />
+                    Competencias - {currentEval.nombre}
+                  </h2>
                 </div>
-                <div className="w-full">
-                  <label htmlFor="year" className="text-gray-700">Año</label>
-                  <input className="input-custom" type="number" id="year" {...register("year")} />
+
+                {/* Add Competencia Form */}
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <h3 className="text-md font-medium text-gray-900 mb-4">Agregar Nueva Competencia</h3>
+                  <form className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                      <input 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                        type="text" 
+                        placeholder="Nombre de la competencia"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                      <input 
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                        type="text" 
+                        placeholder="Descripción"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Competencia</label>
+                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all">
+                        <option value="">Seleccione</option>
+                        {tipoCompetencias.sort((a, b) => a.nombre.localeCompare(b.nombre)).map(tipo => (
+                          <option key={tipo.idTipo} value={tipo.idTipo}>{tipo.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <button 
+                      type="button"
+                      className="bg-zvioleta hover:bg-zvioleta/90 text-white px-4 py-2 rounded-lg transition-colors"
+                    >
+                      Guardar
+                    </button>
+                  </form>
                 </div>
-                <div className="w-full">
-                  <label htmlFor="fechaInicio" className="text-gray-700">Fecha Inicio</label>
-                  <input className="input-custom" type="date" id="fechaInicio" {...register("fechaInicio")} />
+
+                {/* Competencias Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 rounded-lg">
+                      <tr>
+                        <th className="px-6 py-3">ID</th>
+                        <th className="px-6 py-3">Competencia</th>
+                        <th className="px-6 py-3">Tipo</th>
+                        <th className="px-6 py-3 text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentEval.Competencias?.map(competencia => (
+                        <tr key={competencia.idCompetencia} className="bg-white border-b hover:bg-gray-50">
+                          <td className="px-6 py-4 font-medium text-gray-900">{competencia.idCompetencia}</td>
+                          <td className="px-6 py-4">{competencia.nombre || 'Sin asignar'}</td>
+                          <td className="px-6 py-4">{competencia.TipoCompetencium?.nombre}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex justify-center gap-2">
+                              <button className="text-zvioleta hover:text-zvioleta/80 p-1 transition-colors">
+                                <PiPencilSimpleLineFill className="text-lg" />
+                              </button>
+                              <button 
+                                onClick={() => showModal(competencia)} 
+                                className="text-znaranja hover:text-znaranja/80 p-1 transition-colors"
+                              >
+                                <IoEyeSharp className="text-lg" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <div className="w-full">
-                  <label htmlFor="fechaFin" className="text-gray-700">Fecha Fin</label>
-                  <input className="input-custom" type="date" id="fechaFin" {...register("fechaFin")} />
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <FaClipboardList className="text-gray-300 text-6xl mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Selecciona una Evaluación</h3>
+                <p className="text-gray-500">Elige una evaluación de la lista para ver y gestionar sus competencias</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* Create Evaluation Modal */}
+      {openEval && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <FaPlus className="text-zvioleta" />
+                  Crear Nueva Evaluación
+                </h2>
+                <button 
+                  onClick={() => setOpenEval(false)} 
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
+              </div>
+              
+              <form className="grid grid-cols-1 md:grid-cols-3 gap-4" onSubmit={handleSubmit(createEvaluacion)}>
+                <div className="md:col-span-2">
+                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre de la Evaluación
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                    type="text" 
+                    id="nombre" 
+                    placeholder="Ingrese el nombre de la evaluación"
+                    {...register("nombre", { required: true })} 
+                  />
                 </div>
-                <div className="flex justify-center flex-col items-center">
-                  <label htmlFor="activo" className="text-gray-700">¿Activo?</label>
-                  <input className="border p-2 rounded-lg" type="checkbox" defaultChecked={true} {...register("estado")} />
+                
+                <div>
+                  <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+                    Año
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                    type="number" 
+                    id="year" 
+                    placeholder="2024"
+                    {...register("year", { required: true })} 
+                  />
                 </div>
-                <div className="w-full col-span-3">
-                  <label htmlFor="objetivo" className="text-gray-700">Objetivo</label>
-                  <input className="input-custom" type="text" id="objetivo" {...register("objetivo")} />
+                
+                <div>
+                  <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha de Inicio
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                    type="date" 
+                    id="fechaInicio" 
+                    {...register("fechaInicio", { required: true })} 
+                  />
                 </div>
-                <div className="flex justify-center flex-col items-center pl-10 col-span-3">
-                  <button className="bg-zvioleta text-white hover:bg-zvioleta/90 hover:scale-105 px-4 py-2 rounded-md">Guardar</button>
+                
+                <div>
+                  <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha de Fin
+                  </label>
+                  <input 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                    type="date" 
+                    id="fechaFin" 
+                    {...register("fechaFin", { required: true })} 
+                  />
+                </div>
+                
+                <div className="flex items-center">
+                  <div className="flex items-center h-full">
+                    <input 
+                      className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
+                      type="checkbox" 
+                      id="estado"
+                      defaultChecked={true} 
+                      {...register("estado")} 
+                    />
+                    <label htmlFor="estado" className="ml-2 text-sm font-medium text-gray-700">
+                      Evaluación Activa
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="md:col-span-3">
+                  <label htmlFor="objetivo" className="block text-sm font-medium text-gray-700 mb-1">
+                    Objetivo de la Evaluación
+                  </label>
+                  <textarea 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all" 
+                    id="objetivo" 
+                    rows="3"
+                    placeholder="Describe el objetivo de esta evaluación..."
+                    {...register("objetivo")} 
+                  />
+                </div>
+                
+                <div className="md:col-span-3 flex justify-end gap-3 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setOpenEval(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
+                  >
+                    Crear Evaluación
+                  </button>
                 </div>
               </form>
             </div>
           </div>
-        )
-      }
-      <div className="w-full gap-4 mt-5 border-b border-gray-300">
-        {evaluaciones.map(evaluacion => (
-          <div key={evaluacion.idEvaluacion} className={`${currentEval.idEvaluacion == evaluacion.idEvaluacion ? 'bg-zvioleta text-white rounded-md' : ''} flex justify-between items-center`} >
-            <p onClick={() => setCurrentEval(evaluacion)} className='border-b border-gray-200 p-2'>{`${evaluacion.nombre} ${evaluacion.year}`}</p>
-            <button className="bg-znaranja rounded-md p-1" onClick={() => setShowAsignar(true)}>Asignar Usuarios</button>
-          </div>
-        ))}
-        <form className="flex items-center justify-center gap-4">
-          <div className="flex justify-center flex-col items-center w-10/12">
-            <label htmlFor="">Nombre</label>
-            <input className="input-custom" type="text" />
-          </div>
-          <div className="flex justify-center flex-col items-center w-full">
-            <label htmlFor="">Descripcion</label>
-            <input className="input-custom" type="text" />
-          </div>
-          <div className="flex justify-center flex-col items-center w-10/12">
-            <label htmlFor="">Tipo de competencia</label>
-            <select className="input-custom" name="" id="">
-              <option value="">Seleccione</option>
-              {
-                tipoCompetencias.sort((a, b) => a.nombre.localeCompare(b.nombre)).map(tipo => (
-                  <option key={tipo.idTipo} value={tipo.idTipo}>{tipo.nombre}</option>
-                ))
-              }
-            </select>
-          </div>
-          <div className="flex justify-center flex-col items-center pl-10">
-            <button className="bg-zvioleta text-white hover:bg-zvioleta/90 hover:scale-105 px-4 py-2 rounded-md">Guardar</button>
-          </div>
-        </form>
-        <table className="w-full text-md text-left rtl:text-right text-gray-500 mb-8">
-          <thead className="text-md text-gray-700 uppercase bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3">
-                id
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Competencia
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Tipo
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              currentEval.Competencias?.map(competencia => (
-                <tr className="odd:bg-white even:bg-gray-50 border-b border-gray-200" key={competencia.idCompetencia}>
-                  <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
-                    {competencia.idCompetencia}
-                  </th>
-                  <td className="px-6 py-4">
-                    {competencia.nombre || 'Sin asignar'}
-                  </td>
-                  <td className="px-6 py-4">
-                    {competencia.TipoCompetencium.nombre}
-                  </td>
-                  <td className="px-6 py-4 text-lg flex justify-center items-center gap-4">
-                    <button className="text-green-700"><PiPencilSimpleLineFill /></button>
-                    <button onClick={() => showModal(competencia)} className="text-blue-700"><IoEyeSharp /></button>
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
-      {
-        viewModal && (
-          <div className="w-full h-full bg-white/45 absolute top-0 flex justify-center items-start">
-            <form className="w-1/2 h-auto bg-white shadow-lg p-6 mt-52 grid grid-cols-[2fr_1fr_2fr] gap-4">
+        </div>
+      )}
 
-              {/* Título */}
-              <h1 className="col-span-3 text-lg font-semibold text-center mb-4">
-                Empresas de {detalleCompetencia?.nombre}
-              </h1>
-
-              {/* Empresas disponibles */}
-              <div className="flex flex-col gap-2">
-                <h3 className="font-medium">Empresas disponibles</h3>
-                {
-                  detalleCompetencia?.Empresas?.map(empresa => (
-                    <div key={empresa?.idEmpresa} className="flex gap-2 items-center">
-                      <input type="checkbox" className="border p-1 rounded-lg" checked={console.log(selcEmpresas.includes(empresa.idEmpresa))} onChange={() => console.log(empresa)} />
-                      <label>{empresa.nombre}</label>
-                    </div>
-                  ))
-                }
+      {/* Company Assignment Modal */}
+      {viewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <FaBuilding className="text-zvioleta" />
+                  Empresas de {detalleCompetencia?.nombre}
+                </h2>
+                <button 
+                  onClick={() => setViewModal(false)} 
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <FaTimes className="text-xl" />
+                </button>
               </div>
 
-              {/* Botones para asignar/desasignar */}
-              <div className="flex flex-col justify-center items-center gap-2">
-                <button type="button" className="bg-gray-300 hover:bg-gray-400 p-2 rounded">{`>>`}</button>
-                <button onClick={() => console.log()} type="button" className="bg-gray-300 hover:bg-gray-400 p-2 rounded">{`<<`}</button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Available Companies */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <FaBuilding className="text-gray-600" />
+                    Empresas Disponibles
+                  </h3>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {detalleCompetencia?.Empresas?.map(empresa => (
+                      <div key={empresa?.idEmpresa} className="flex items-center gap-2 p-2 bg-white rounded border">
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
+                          onChange={() => console.log(empresa)} 
+                        />
+                        <label className="text-sm text-gray-700">{empresa.nombre}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Transfer Buttons */}
+                <div className="flex flex-col justify-center items-center gap-4">
+                  <button 
+                    type="button" 
+                    className="bg-zvioleta hover:bg-zvioleta/90 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Asignar →
+                  </button>
+                  <button 
+                    type="button" 
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    ← Quitar
+                  </button>
+                </div>
+
+                {/* Assigned Companies */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <FaBuilding className="text-zvioleta" />
+                    Empresas Asignadas
+                  </h3>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {empresasAsignadas?.map(empresa => (
+                      <div key={empresa.idEmpresa} className="flex items-center gap-2 p-2 bg-white rounded border">
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 text-zvioleta bg-gray-100 border-gray-300 rounded focus:ring-zvioleta/50" 
+                          onChange={() => setEmpresasAsignadas(prev => 
+                            prev.filter(e => e.idEmpresa !== empresa.idEmpresa)
+                          )} 
+                        />
+                        <label className="text-sm text-gray-700">{empresa.nombre}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Empresas asignadas */}
-              <div className="flex flex-col gap-2">
-                <h3 className="font-medium">Empresas asignadas</h3>
-                {
-                  empresas?.map(empresa => (
-                    <div key={empresa.idEmpresa} className="flex gap-2 items-center">
-                      <input type="checkbox" className="border p-1 rounded-lg" checked={console.log(selcEmpresas.includes(empresa.idEmpresa))} onChange={() => setSetEmpresasAsignadas(prev => {
-                        return {
-                          ...prev,
-                          idEmpresa: empresa.idEmpresa,
-                          nombre: empresa.nombre
-                        }
-                      })} />
-                      <label>{empresa.nombre}</label>
-                    </div>
-                  ))
-                }
-              </div>
-
-              {/* Botones de acción */}
-              <div className="col-span-3 flex justify-end gap-4 mt-4">
-                <button type="button" onClick={() => setViewModal(false)} className="bg-gray-300 text-black py-2 px-4 rounded-md hover:scale-105 hover:bg-gray-400">
+              <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setViewModal(false)} 
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
                   Cancelar
                 </button>
-                <button type="button" className="bg-purple-600 text-white py-2 px-4 rounded-md hover:scale-105 hover:bg-purple-700">
-                  Guardar
+                <button 
+                  type="button" 
+                  className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
+                >
+                  Guardar Cambios
                 </button>
               </div>
-
-            </form>
+            </div>
           </div>
-        )
-      }
+        </div>
+      )}
 
-      {showAsignar && <AsignarEvaluacion idEvaluacion={currentEval?.idEvaluacion} setShowAsignar={setShowAsignar} />}
-
+      {/* User Assignment Modal */}
+      {showAsignar && (
+        <AsignarEvaluacion 
+          idEvaluacion={currentEval?.idEvaluacion} 
+          setShowAsignar={setShowAsignar} 
+        />
+      )}
     </div>
   )
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { URLBASE } from "../lib/actions";
 import { useUser } from "../context/UserContext";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const FormUpdatePassword = () => {

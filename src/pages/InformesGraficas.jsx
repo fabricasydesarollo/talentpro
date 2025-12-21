@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
 import { BarChartAdvance, PieChartCumplimiento } from './GraficaAvances';
 import Loading from './Loading';
 import { useUser } from '../context/UserContext';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { FaSearch } from 'react-icons/fa';
 
 
 const InformesGraficas = () => {
@@ -14,9 +15,7 @@ const InformesGraficas = () => {
   const [empresa, setEmpresa] = useState({})
   const [evaluaciones, setEvaluaciones] = useState([])
   const [idEvaluacion, setIdEvaluacion] = useState(0)
-  const [openModal, setOpenModal] = useState(false)
-  // const idSede = React.useRef(0);
-  // const idEmpresa = React.useRef(0);
+  const [openModal, setOpenModal] = useState(false);
 
 
   const user = useUser()
@@ -85,38 +84,87 @@ const InformesGraficas = () => {
   })
 
   return (
-    <div className="w-11/12 p-5">
-      <h1 className="text-3xl font-bold mb-4 text-zvioleta text-center">Gráficas - Avance General</h1>
-      <div className="mb-4 flex gap-2">
-        <div className="flex flex-col">
-          <label htmlFor="id-evaluacion">Evaluación</label>
-          <select
-            value={idEvaluacion}
-            onChange={(e) => setIdEvaluacion(Number(e.target.value))}
-            className="w-80 border-gray-300 rounded-md" name="evaluacion" id="id-evaluacion" >
-            <option disabled selected value={0}>Seleccione...</option>
-            {evaluaciones.map((evaluacion, index) => (
-              <option key={index} value={evaluacion.idEvaluacion}>{`${evaluacion.nombre} ${evaluacion.year}`}</option>
-            ))}
-          </select>
+    <div className="w-11/12 p-5 mx-auto">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+          Gráficas - Avance General
+        </h1>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <FaSearch className="text-gray-500" size={20} />
+          <h2 className="text-lg font-medium text-gray-900">Seleccionar Evaluación</h2>
         </div>
-        <div className='flex items-end'>
-          <button onClick={handleChangeSede} className="bg-zvioleta py-2 px-10 rounded-lg text-white hover:scale-105 shadow-md">Consultar</button>
+        
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+          <div className="flex-1 min-w-0">
+            <label 
+              htmlFor="id-evaluacion" 
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Evaluación
+            </label>
+            <select
+              value={idEvaluacion}
+              onChange={(e) => setIdEvaluacion(Number(e.target.value))}
+              className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5 bg-white text-gray-900"
+              name="evaluacion" 
+              id="id-evaluacion"
+            >
+              <option value={0}>Seleccione una evaluación...</option>
+              {evaluaciones.map((evaluacion, index) => (
+                <option key={index} value={evaluacion.idEvaluacion}>
+                  {`${evaluacion.nombre} ${evaluacion.year}`}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <button 
+            onClick={handleChangeSede} 
+            className="bg-zvioleta hover:bg-zvioleta/90 text-white px-6 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={idEvaluacion === 0}
+          >
+            <FaSearch size={16} />
+            Consultar
+          </button>
         </div>
       </div>
       {
         cubrimiento.length == 0 && !isLoading ? (
-          <p className="text-center text-znaranja">*Seleccione una evaluación para ver las gráficas.*</p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <div className="text-gray-400 mb-4">
+              <FaSearch size={48} className="mx-auto" />
+            </div>
+            <p className="text-lg text-gray-600 mb-2">No hay datos disponibles</p>
+            <p className="text-sm text-gray-700">Seleccione una evaluación para ver las gráficas</p>
+          </div>
         ) : isLoading ? (
           <Loading />
         ) : (
-          <div className="flex flex-col justify-center">
-            <div className='flex shadow-lg bg-slate-100 rounded-md mb-4'>
-              <PieChartCumplimiento data={dataPieEvaluacion} nombre='Avance Zentria Evaluación' />
-              <PieChartCumplimiento data={dataPieAutoevaluacion} nombre='Avance Zentria Autoevaluación' />
+          <div className="space-y-6">
+            {/* Charts Container */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Avance de Evaluaciones</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <PieChartCumplimiento data={dataPieEvaluacion} nombre='Avance Zentria Evaluación' />
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <PieChartCumplimiento data={dataPieAutoevaluacion} nombre='Avance Zentria Autoevaluación' />
+                </div>
+              </div>
             </div>
-            <div className="shadow-lg rounded-md bg-slate-100">
-              <BarChartAdvance data={cubrimiento?.totalUsuariosEmpresa} nombre={'Empresas'} setEmpresa={setEmpresa} setOpenModal={setOpenModal} />
+            
+            {/* Bar Chart Container */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Avance por Empresas</h3>
+              <div className="bg-gray-50 rounded-lg p-4 min-h-[500px]">
+                <BarChartAdvance data={cubrimiento?.totalUsuariosEmpresa} nombre={'Empresas'} setEmpresa={setEmpresa} setOpenModal={setOpenModal} />
+              </div>
             </div>
           </div>
         )
