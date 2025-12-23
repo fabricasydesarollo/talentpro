@@ -260,7 +260,7 @@ const Resultados = () => {
 
             {/* Resultados */}
             <tr>
-              <td colSpan="3" className='border border-gray-400 p-2 bg-gray-100 font-semibold text-sm'>COMPETENCIA</td>
+              <td colSpan="3" className='border border-gray-400 p-2 bg-gray-100 font-semibold text-sm'>ÍTEM EVALUADO</td>
               <td className='border border-gray-400 p-2 bg-gray-100 font-semibold text-sm text-center'>PROMEDIO</td>
             </tr>
             {respuestas?.evaluacion?.map((item, idx) => (

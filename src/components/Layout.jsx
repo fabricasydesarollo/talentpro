@@ -69,7 +69,7 @@ const Layout = ({ isMenuOpen, setIsMenuOpen }) => {
   };
 
   return (
-    <nav className={`fixed h-full bg-zvioleta text-white flex flex-col transition-all duration-300 ease-in-out z-20 ${
+    <nav className={`fixed h-full bg-zvioleta text-white flex flex-col transition-all duration-300 ease-in-out z-20 print:hidden ${
       isMenuOpen ? 'w-64 translate-x-0' : 'w-16'
     } sm:translate-x-0 -translate-x-full shadow-xl`}>
       
