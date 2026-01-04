@@ -127,8 +127,8 @@ const Evaluacion = () => {
       setCompleted(true);
       setMostrarComentarios(true);
       setShowConfirmDialog(false);
-      toast.success("Evaluación enviada", {
-        description: "La evaluación se ha registrado correctamente"
+      toast.success("Respuestas enviadas", {
+        description: "Las respuestas se ha registrado correctamente, continua con los comentarios y acciones de mejora"
       });
     } catch {
       toast.warning("Evaluación ya registrada", {
@@ -272,7 +272,7 @@ const Evaluacion = () => {
                           className="flex items-center gap-2 px-6 py-3 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg font-medium transition-colors"
                         >
                           <FaCheck className="text-sm" />
-                          Finalizar Evaluación
+                          Continuar y Avanzar
                         </button>
                       ) : (
                         <button
@@ -295,8 +295,7 @@ const Evaluacion = () => {
                 <ComentariosAcciones 
                   idColaborador={usuario?.idUsuario} 
                   idEvaluador={evaluadorId} 
-                  idEvaluacion={evaluacion?.idEvaluacion} 
-                  esEvaluador={!(usuario?.idUsuario === evaluadorId)} 
+                  idEvaluacion={evaluacion?.idEvaluacion}
                 />
               </div>
             )
@@ -306,40 +305,86 @@ const Evaluacion = () => {
         {/* Confirmation Modal */}
         {showConfirmDialog && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-white w-full max-w-md mx-4 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-white w-full max-w-lg mx-4 rounded-xl shadow-2xl overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <FaExclamationTriangle className="text-yellow-600 text-lg" />
+                  <div className="p-3 bg-znaranja/10 rounded-lg">
+                    <FaExclamationTriangle className="text-znaranja text-xl" />
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Confirmar envío
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {colaborador ? '¡Atención! Confirmar envío de evaluación' : 'Confirmar envío de autoevaluación'}
                   </h2>
                 </div>
                 
-                <p className="text-gray-600 mb-4">
-                  ¿Estás seguro de que deseas enviar la evaluación? Esta acción no se puede deshacer.
+                <p className="text-gray-700 mb-6 font-medium">
+                  Estás a punto de finalizar la evaluación. Esta acción no se puede deshacer.
                 </p>
                 
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-                  <p className="text-blue-800 text-sm">
-                    <strong>Recordatorio:</strong> Podrás agregar comentarios después de enviar la evaluación.
-                  </p>
-                </div>
+                {/* Recordatorio prominente sobre comentarios - Solo para evaluadores */}
+                {colaborador && (
+                  <>
+                    <div className="bg-znaranja/5 border-2 border-znaranja rounded-lg p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-znaranja rounded-full flex-shrink-0">
+                          <FaClipboardList className="text-white text-sm" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-znaranja text-lg mb-2">
+                            Recordatorio importante.
+                          </h3>
+                          <p className="text-znaranja font-semibold mb-2">
+                            Como evaluador, es NECESARIO que registres:
+                          </p>
+                          <ul className="text-znaranja space-y-1 text-sm">
+                            <li className="flex items-center gap-2">
+                              <span className="w-2 h-2 bg-znaranja rounded-full"></span>
+                              <strong>Comentarios detallados</strong> sobre el desempeño
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="w-2 h-2 bg-znaranja rounded-full"></span>
+                              <strong>Acciones de mejora (Si aplica)</strong> específicas y medibles
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <span className="w-2 h-2 bg-znaranja rounded-full"></span>
+                              <strong>Retroalimentación constructiva</strong> para el colaborador
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Confirmación adicional - Solo para evaluadores */}
+                    <div className="bg-yellow-100 border border-yellow-100 rounded-lg p-4 mb-6">
+                      <p className="text-yellow-600 text-sm font-medium">
+                        <strong>⚠️ Importante:</strong> Después de enviar la evaluación, serás dirigido automáticamente 
+                        a la sección de comentarios donde <strong>DEBES completar</strong> la retroalimentación para el colaborador.
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Mensaje simple para autoevaluación */}
+                {!colaborador && (
+                  <div className="bg-zvioleta/5 border border-zvioleta rounded-lg p-4 mb-6">
+                    <p className="text-zvioleta text-sm">
+                      <strong>Nota:</strong> Después de enviar tu autoevaluación, registra un comentario.
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="flex gap-3 p-6 bg-gray-50 border-t border-gray-200">
                 <button
-                  className="flex-1 px-4 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+                  className="flex-1 px-4 py-3 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors"
                   onClick={() => setShowConfirmDialog(false)}
                 >
                   Cancelar
                 </button>
                 <button
-                  className="flex-1 px-4 py-2 text-white bg-zvioleta hover:bg-zvioleta/90 rounded-lg font-medium transition-colors"
+                  className="flex-1 px-4 py-3 text-white bg-zvioleta hover:bg-zvioleta/90 rounded-lg font-bold transition-colors shadow-lg"
                   onClick={confirmSubmit}
                 >
-                  Confirmar
+                  Continuar
                 </button>
               </div>
             </div>

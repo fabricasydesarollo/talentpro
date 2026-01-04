@@ -20,7 +20,7 @@ const Seguimiento = () => {
     const obtenerDatos = async () => {
       try {
         const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
-          params: { idColaborador, idEvaluacion },
+          params: { idColaborador, idEvaluacion, idEvaluador: user.user?.idUsuario },
         });
         setCompetencias(response.data?.data);
       } catch {
@@ -42,17 +42,21 @@ const Seguimiento = () => {
 
   return (
     Object.keys(competencias).length > 1 ? (
-      <ActualizarSeguimiento
-        idColaborador={idColaborador}
-        idEvaluacion={idEvaluacion}
-      />
+      <div className='w-9/12 h-auto'>
+        <ActualizarSeguimiento
+          idColaborador={idColaborador}
+          idEvaluacion={idEvaluacion}
+          idEvaluador={user?.user?.idUsuario}
+        />
+      </div>
     ) : (
-      <ComentariosAcciones
-        esEvaluador={true}
-        idColaborador={idColaborador}
-        idEvaluacion={idEvaluacion}
-        idEvaluador={user?.user?.idUsuario}
-      />
+      <div className='w-9/12 h-auto'>
+        <ComentariosAcciones
+          idColaborador={idColaborador}
+          idEvaluacion={idEvaluacion}
+          idEvaluador={user?.user?.idUsuario}
+        />
+      </div>
     )
   );
 };

@@ -317,7 +317,7 @@ const Resultados = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className='text-center text-gray-500 italic text-sm'>
+                  <div className='text-center text-red-500 italic text-sm font-bold'>
                     Aún no se han registrado comentarios
                   </div>
                 )}
