@@ -4,7 +4,7 @@ import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import PropTypes from 'prop-types';
 
-const ActualizarSeguimiento = ({idColaborador, idEvaluacion}) => {
+const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
   const [comentariosGenerales, setComentariosGenerales] = useState('');
   const [accionesMejoramiento, setAccionesMejoramiento] = useState([]);
   const [competencias, setCompetencias] = useState([]);
@@ -17,7 +17,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion}) => {
       try {
         setLoading(true);
         const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
-          params: { idColaborador, idEvaluacion }
+          params: { idColaborador, idEvaluacion, idEvaluador }
         });
         const data = response.data?.data;
         if (data) {
@@ -67,6 +67,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion}) => {
       try {
         const payload = {
           idEvaluacion,
+          idEvaluador,
           idColaborador,
           comentario: comentariosGenerales,
           accionesMejoramiento
@@ -104,7 +105,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion}) => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 bg-white rounded-lg shadow-md space-y-6">
+    <div className="w-full mx-auto p-4 bg-white rounded-lg shadow-md space-y-6">
       {/* Título de la sección */}
       <div className="flex items-center">
         <svg className="w-5 h-5 mr-2 text-zvioleta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,6 +283,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion}) => {
 ActualizarSeguimiento.propTypes = {
   idEvaluacion: PropTypes.string,
   idColaborador: PropTypes.string,
+  idEvaluador: PropTypes.string,
 };
 
 export default ActualizarSeguimiento;

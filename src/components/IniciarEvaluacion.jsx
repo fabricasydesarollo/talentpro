@@ -84,6 +84,10 @@ const IniciarEvaluacion = ({ onClose, setOnStart, fechas }) => {
                 <div className="w-1 h-1 bg-zvioleta rounded-full mt-1.5 flex-shrink-0"></div>
                 <p>No podrás modificar respuestas después del envío</p>
               </div>
+              <div className="flex items-start gap-2 text-xs text-gray-700">
+                <div className="w-1 h-1 bg-zvioleta rounded-full mt-1.5 flex-shrink-0"></div>
+                <p>Registra comentarios y acciones de mejora al final de la evaluación</p>
+              </div>
             </div>
           </div>
 

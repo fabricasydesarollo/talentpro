@@ -5,13 +5,15 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types'
 
-const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador, esEvaluador }) => {
+const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
   const [comentariosGenerales, setComentariosGenerales] = useState('');
   const [accionesMejoramiento, setAccionesMejoramiento] = useState([]);
   const [competenciasFiltradas, setCompetenciasFiltradas] = useState([]);
   const [retroalimentacion, setRetroalimentacion] = useState(false);
   const [respuestas, setRespuestas] = useState([])
+  const [esEvaluador, setEsEvaluador] = useState(Number(idColaborador) != Number(idEvaluador));
   const navigate = useNavigate();
+  
 
   // Fetch competencias solo si es evaluador
   useEffect(() => {
