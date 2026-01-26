@@ -8,7 +8,8 @@ import { toast } from 'sonner';
 import Loading from './Loading';
 import IniciarEvaluacion from '../components/IniciarEvaluacion';
 import { smoothScrollTo } from '../lib/utils';
-import { FaArrowLeft, FaArrowRight, FaCheck, FaUser, FaClipboardList, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUser, FaClipboardList, FaExclamationTriangle } from 'react-icons/fa';
+import { MdOutlineArrowBackIos, MdOutlineArrowLeft, MdOutlineArrowRight, MdOutlineCheck } from "react-icons/md";
 
 
 const Evaluacion = () => {
@@ -261,7 +262,6 @@ const Evaluacion = () => {
                             : "bg-gray-600 hover:bg-gray-700 text-white"
                         }`}
                       >
-                        <FaArrowLeft className="text-sm" />
                         Anterior
                       </button>
 
@@ -271,7 +271,6 @@ const Evaluacion = () => {
                           onClick={handleFinalizarClick}
                           className="flex items-center gap-2 px-6 py-3 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg font-medium transition-colors"
                         >
-                          <FaCheck className="text-sm" />
                           Continuar y Avanzar
                         </button>
                       ) : (
@@ -281,7 +280,6 @@ const Evaluacion = () => {
                           className="flex items-center gap-2 px-6 py-3 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg font-medium transition-colors"
                         >
                           Siguiente
-                          <FaArrowRight className="text-sm" />
                         </button>
                       )}
                     </div>
