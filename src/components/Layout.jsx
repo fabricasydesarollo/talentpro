@@ -91,7 +91,7 @@ const Layout = ({ isMenuOpen, setIsMenuOpen }) => {
         
         <button 
           onClick={toggleMenu} 
-          className={`absolute -right-3 top-1/2 -translate-y-1/2 bg-zvioleta border-2 border-white/30 rounded-full p-2 hover:bg-zvioleta hover:border-white/50 transition-all duration-200 shadow-lg ${
+          className={`absolute ${isMenuOpen ? '-right-3' : '-right-10 sm:-right-3'} top-1/2 -translate-y-1/2 bg-zvioleta border-2 border-white/30 rounded-full p-2 hover:bg-zvioleta hover:border-white/50 transition-all duration-200 shadow-lg ${
             isMenuOpen ? '' : 'sm:block'
           }`}
         >
