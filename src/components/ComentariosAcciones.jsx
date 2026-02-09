@@ -164,7 +164,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
                 <p>
                   Consulta las ideas en{' '}
                   <a 
-                    href="https://grupozentria.sharepoint.com/:f:/s/TD-TI-Zentria/RRHH/ErcFIunNaDlLjoaRMWxog3cByTRhRz7bz_9EtNFtgwHcIg" 
+                    href="https://grupozentria-my.sharepoint.com/:f:/g/personal/nini_cifuentes_zentria_com_co/IgDfjlLV-zrGTpS0Iixn3CetAc2Rdvh7UWwxOV1YZle_tKo?e=gVE9k6" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="underline text-znaranja hover:text-znaranja/80"
