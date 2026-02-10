@@ -38,9 +38,9 @@ const ProtectedLayout = ({ allowedProfiles }) => {
             navigate("/");
             return;
           }
-        }
-
-        if (!res?.data?.data) {
+        }        
+        
+        if (!res?.data?.data || (res.data?.data?.idUsuario !== user?.user?.idUsuario)) {
           toast.dismiss(loadingToast);
           toast.error("Sesión no válida", {
             description: "Redirigiendo al login...",
