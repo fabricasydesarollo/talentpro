@@ -2,10 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { URLBASE } from "../lib/actions";
 import { normalizarData } from "../lib/utils";
-import { FaTimes, FaSave, FaUsers, FaBuilding, FaSearch, FaChevronLeft, FaChevronRight, FaChevronDown } from "react-icons/fa";
+import { FaTimes, FaSave, FaUsers, FaBuilding, FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "sonner";
 
-const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
+const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar, nombre, year }) => {
 
   const [usuarios, setUsuarios] = useState([])
   const [evaluaciones, setEvaluaciones] = useState([])
@@ -16,6 +16,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
   const [isSaving, setIsSaving] = useState(false)
   const [filtroEmpresa, setFiltroEmpresa] = useState('')
   const [filtroNombre, setFiltroNombre] = useState('')
+  const [filtroPendientes, setFiltroPendientes] = useState('all')
 
   useEffect(() => {
     const fechData = async () => {
@@ -60,12 +61,14 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
     const normalized = normalizarData(usuarios, evaluaciones);
     setUsuariosNormalizados(normalized);
     // Apply current filters to the normalized data
-    aplicarFiltros(normalized, filtroEmpresa, filtroNombre);
-  }, [usuarios, evaluaciones, filtroEmpresa, filtroNombre]);
+    aplicarFiltros(normalized, filtroEmpresa, filtroNombre, filtroPendientes);
+  }, [usuarios, evaluaciones, filtroEmpresa, filtroNombre, filtroPendientes]);
 
-  function aplicarFiltros(usuarios, empresa, nombre) {
+  function aplicarFiltros(usuarios, empresa, nombre, pendientes) {
+  
     let filtrados = usuarios;
-
+    if (!usuarios) return [];
+    
     // Filtrar por empresa
     if (empresa !== '') {
       filtrados = filtrados.filter(user => user.idEmpresa == empresa);
@@ -77,6 +80,22 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
         user.nombre.toLowerCase().includes(nombre.toLowerCase()) ||
         user.idUsuario.toString().includes(nombre)
       );
+    }
+
+    // Filtrar por pendientes
+    if (pendientes !== '' && pendientes !== 'all') {
+      filtrados = filtrados.filter(user => {
+        if (pendientes == '1') {
+          // Mostrar solo los que tienen evaluación O autoevaluación
+          return user.evaluacion !== user.autoevaluacion;
+        } else if (pendientes === '2') {
+          // Mostrar solo los que NO tienen evaluación NI autoevaluación
+          return !user.evaluacion && !user.autoevaluacion;
+        } else {
+          // Mostrar solo los que tienen evaluación Y autoevaluación
+          return user.evaluacion && user.autoevaluacion;
+        }
+      });      
     }
 
     setUsuariosFiltrados(filtrados);
@@ -91,6 +110,12 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
 
   function filtrarUsuariosNombre(nombre) {
     setFiltroNombre(nombre);
+    // Reset to first page when filter changes
+    setCurrentPage(1);
+  }
+
+  function filtrarUsuariosPendientes(pendiente) {    
+    setFiltroPendientes(pendiente);
     // Reset to first page when filter changes
     setCurrentPage(1);
   }
@@ -142,11 +167,11 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
           })
         )
       );
-      
+
       toast.success('Asignaciones guardadas', {
         description: 'Las evaluaciones se asignaron correctamente'
       });
-      
+
       setShowAsignar(false);
     } catch (error) {
       toast.error('Error al guardar', {
@@ -168,11 +193,11 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
             <div className="flex items-center gap-3">
               <FaUsers className="text-2xl" />
               <div>
-                <h1 className="text-2xl font-bold">Asignar Evaluación</h1>
+                <h1 className="text-2xl font-bold">{nombre} {year}</h1>
                 <p className="text-white/90 text-sm">Selecciona usuarios para asignar evaluaciones</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-col sm:flex-row">
               {selectedCount > 0 && (
                 <div className="bg-white/20 px-3 py-1 rounded-lg text-sm">
                   {selectedCount} seleccionados
@@ -206,11 +231,12 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                 <FaSearch className="text-zvioleta" />
                 Filtros
               </h3>
-              {(filtroEmpresa !== '' || filtroNombre !== '') && (
+              {(filtroEmpresa !== '' || filtroNombre !== '' || (filtroPendientes !== '' && filtroPendientes !== 'all')) && (
                 <button
                   onClick={() => {
                     setFiltroEmpresa('');
                     setFiltroNombre('');
+                    setFiltroPendientes('all');
                   }}
                   className="text-sm text-zvioleta hover:text-zvioletaopaco transition-colors"
                 >
@@ -218,7 +244,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                 </button>
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label htmlFor="empresa" className="block text-sm font-medium text-gray-700 mb-1">
                   Empresa {filtroEmpresa !== '' && <span className="text-zvioleta">•</span>}
@@ -229,9 +255,8 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                     onChange={(e) => filtrarUsuariosEmpresas(e.target.value)}
                     id="empresa"
                     value={filtroEmpresa}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${
-                      filtroEmpresa !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${filtroEmpresa !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
+                      }`}
                   >
                     <option value="">Todas las empresas</option>
                     {empresas?.map(empresa => (
@@ -242,7 +267,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                   </select>
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-1">
                   Usuario {filtroNombre !== '' && <span className="text-zvioleta">•</span>}
@@ -254,14 +279,33 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                     id="usuario"
                     placeholder="Buscar por nombre o documento"
                     value={filtroNombre}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${
-                      filtroNombre !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all ${filtroNombre !== '' ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
+                      }`}
                     onChange={(e) => filtrarUsuariosNombre(e.target.value)}
                   />
                 </div>
               </div>
-
+              <div className="flex items-end gap-4">
+                <div className="flex flex-col w-full">
+                  <label htmlFor="pendientes" className="text-sm font-medium text-gray-700 mb-1">
+                    Filtrar por pendientes {(filtroPendientes !== '' && filtroPendientes !== 'all') && <span className="text-zvioleta">•</span>}
+                  </label>
+                  <select 
+                    name="pendientes" 
+                    id="pendientes"
+                    className={`w-full border rounded-lg focus:ring-2 focus:ring-zvioleta/50 focus:border-zvioleta transition-all py-2 px-3 ${
+                      (filtroPendientes !== '' && filtroPendientes !== 'all') ? 'border-zvioleta bg-zvioleta/5' : 'border-gray-300'
+                    }`}
+                    value={filtroPendientes}
+                    onChange={(e) => filtrarUsuariosPendientes(e.target.value)}
+                  >
+                    <option value="all">Todos</option>
+                    <option value="1">Parcial</option>
+                    <option value="2">Pendientes</option>
+                    <option value="3">Completos</option>
+                  </select>
+                </div>
+              </div>
               <div className="flex items-end gap-4">
                 <div className="flex items-center gap-2">
                   <input
@@ -364,7 +408,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                           )}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                           <label htmlFor="pageSize" className="text-sm text-gray-700">Por página:</label>
@@ -391,11 +435,11 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                           >
                             <FaChevronLeft className="text-sm" />
                           </button>
-                          
+
                           <span className="text-sm text-gray-700 px-3">
                             {currentPage} de {totalPages}
                           </span>
-                          
+
                           <button
                             disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage(currentPage + 1)}
@@ -415,16 +459,17 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar }) => {
                   <FaUsers className="text-gray-300 text-6xl mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron usuarios</h3>
                   <p className="text-gray-500">
-                    {filtroEmpresa !== '' || filtroNombre !== '' 
-                      ? 'Intenta ajustar los filtros de búsqueda' 
+                    {filtroEmpresa !== '' || filtroNombre !== '' || (filtroPendientes !== '' && filtroPendientes !== 'all')
+                      ? 'Intenta ajustar los filtros de búsqueda'
                       : 'No hay usuarios disponibles'
                     }
                   </p>
-                  {(filtroEmpresa !== '' || filtroNombre !== '') && (
+                  {(filtroEmpresa !== '' || filtroNombre !== '' || (filtroPendientes !== '' && filtroPendientes !== 'all')) && (
                     <button
                       onClick={() => {
                         setFiltroEmpresa('');
                         setFiltroNombre('');
+                        setFiltroPendientes('all')
                       }}
                       className="mt-3 text-zvioleta hover:text-zvioletaopaco transition-colors text-sm"
                     >

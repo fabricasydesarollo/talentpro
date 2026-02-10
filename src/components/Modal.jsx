@@ -119,8 +119,9 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                 }))
                 : [{
                     idEvaluador: idUsuario,
-                    idUsuario: null
-                }];
+                    idUsuario: null,
+                    idEvaluacion: idEvaluacion
+                }];            
 
             const res = await axios.post(`${URLBASE}/usuarios/colaboradores`, { usuarios: usuariosAsignados });
             toast.success(res.data.message);
