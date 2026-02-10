@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { toast } from 'sonner';
 import axios from 'axios';
 import { URLBASE } from '../lib/actions.js';
-import { FaTimes, FaTrash, FaCalendarAlt, FaUser, FaClipboardList } from 'react-icons/fa';
+import { FaTimes, FaTrash, FaCalendarAlt, FaUser, FaClipboardList, FaComment } from 'react-icons/fa';
 
 // Estilo básico para el modal (puedes personalizarlo)
 Modal.setAppElement('#root'); // Esto es necesario para accesibilidad
@@ -30,7 +30,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
       });
       
       if (buscarUsuario) buscarUsuario();
-    } catch (error) {
+    } catch {
       toast.error('Error al eliminar', {
         description: 'No se pudo eliminar la evaluación'
       });
@@ -131,9 +131,9 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                   return (
                     <div
                       key={`lista-${index}`}
-                      className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow bg-white"
+                      className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow"
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start flex-col sm:flex-row">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2">
                             <FaClipboardList className="text-zvioleta text-sm" />
@@ -142,7 +142,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                             </h3>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                          <div className="flex flex-col gap-2 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Tipo:</span>
                               <span className="px-2 py-1 bg-gray-100 rounded-md text-xs">
@@ -153,7 +153,13 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                             <div className="flex items-center gap-2">
                               <FaUser className="text-xs" />
                               <span className="font-medium">Evaluador:</span>
-                              <span>{evaluacion?.evaluadorNombre}</span>
+                              <span >{evaluacion?.evaluadorNombre}</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <FaComment className="text-xs" />
+                              <span className="font-medium">Comentario:</span>
+                              <span className={`${evaluacion?.comentario == "Pendiente" ? "text-znaranja" : "text-zverde"}`}>{evaluacion?.comentario}</span>
                             </div>
                             
                             <div className="flex items-center gap-2 md:col-span-2">

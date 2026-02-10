@@ -9,8 +9,6 @@ import Loading from './Loading';
 import IniciarEvaluacion from '../components/IniciarEvaluacion';
 import { smoothScrollTo } from '../lib/utils';
 import { FaUser, FaClipboardList, FaExclamationTriangle } from 'react-icons/fa';
-import { MdOutlineArrowBackIos, MdOutlineArrowLeft, MdOutlineArrowRight, MdOutlineCheck } from "react-icons/md";
-
 
 const Evaluacion = () => {
   const [selectedValues, setSelectedValues] = useState({});
@@ -31,7 +29,7 @@ const Evaluacion = () => {
   const competencias = evaluacion?.Competencias || [];
   const competenciaActual = competencias[currentPage];
   const usuario = colaborador ? user?.colaboradores?.colaboradores.find(c => c.idUsuario == idUsuario) : user?.user;
-  
+
   const dataParams = {
     idEmpresa: usuario?.Empresas[0].idEmpresa || null,
     idNivelCargo: usuario?.idNivelCargo,
@@ -59,7 +57,7 @@ const Evaluacion = () => {
         });
         setEvaluacion(evaluacionResponse.data?.data || []);
         setIsLoading(false);
-      } catch(err){
+      } catch (err) {
         toast.error('Error al cargar datos', {
           description: err.response?.data?.message || 'No se pudieron obtener los datos'
         });
@@ -135,6 +133,7 @@ const Evaluacion = () => {
       toast.warning("Evaluación ya registrada", {
         description: "Las respuestas ya fueron enviadas anteriormente"
       });
+      navigate(`/seguimiento/${idUsuario}/${idEvaluacion}`)
     }
   };
 
@@ -159,7 +158,7 @@ const Evaluacion = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Progress Bar */}
           {!completed && competencias.length > 0 && (
             <div className="mt-4">
@@ -168,7 +167,7 @@ const Evaluacion = () => {
                 <span>{currentPage + 1} de {competencias.length} competencias</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-gradient-to-r from-zvioleta to-znaranja h-2 rounded-full transition-all duration-300"
                   style={{ width: `${((currentPage + 1) / competencias.length) * 100}%` }}
                 ></div>
@@ -201,13 +200,13 @@ const Evaluacion = () => {
                   <div className="p-6 space-y-6">
                     {competenciaActual?.Descriptores?.map((descriptor, index) => (
                       <div key={descriptor.idDescriptor} className="border border-gray-200 rounded-lg overflow-hidden">
-                        <div className="bg-gray-50 p-4 border-b border-gray-200">
-                          <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                            <span className="w-6 h-6 bg-zvioleta text-white rounded-full flex items-center justify-center text-xs font-bold">
-                              {index + 1}
-                            </span>
-                            {descriptor.descripcion}
-                          </h3>
+                        <div className="bg-gray-50 p-4 border-b border-gray-200 flex items-center sm:flex-row flex-col">
+                          <div className="w-6 h-6 bg-zvioleta text-white text-xs font-bold rounded-full flex justify-center items-center mr-2">
+                            <span>{index + 1}</span>
+                          </div>
+                            <h3 className="font-semibold text-gray-900 w-full">
+                              {descriptor.descripcion}
+                            </h3>
                         </div>
 
                         <div className="p-4 space-y-3">
@@ -216,17 +215,15 @@ const Evaluacion = () => {
                             return (
                               <div
                                 key={calificacion.idCalificacion}
-                                className={`cursor-pointer p-4 border-2 rounded-lg transition-all duration-200 hover:shadow-md ${
-                                  isSelected 
-                                    ? 'border-zvioleta bg-zvioleta/5 shadow-sm' 
+                                className={`cursor-pointer p-4 border-2 rounded-lg transition-all duration-200 hover:shadow-md ${isSelected
+                                    ? 'border-zvioleta bg-zvioleta/5 shadow-sm'
                                     : 'border-gray-200 hover:border-gray-300'
-                                }`}
+                                  }`}
                                 onClick={() => handleRadioChange(descriptor.idDescriptor, calificacion.idCalificacion)}
                               >
                                 <div className="flex items-center space-x-3">
-                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                    isSelected ? 'bg-zvioleta border-zvioleta' : 'border-gray-300'
-                                  }`}>
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? 'bg-zvioleta border-zvioleta' : 'border-gray-300'
+                                    }`}>
                                     {isSelected && <div className="w-2 h-2 bg-white rounded-full"></div>}
                                   </div>
                                   <div className="flex-1">
@@ -256,11 +253,10 @@ const Evaluacion = () => {
                         type="button"
                         onClick={prevPage}
                         disabled={currentPage <= 0}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                          currentPage <= 0 
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
+                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${currentPage <= 0
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                             : "bg-gray-600 hover:bg-gray-700 text-white"
-                        }`}
+                          }`}
                       >
                         Anterior
                       </button>
@@ -269,7 +265,7 @@ const Evaluacion = () => {
                         <button
                           type="button"
                           onClick={handleFinalizarClick}
-                          className="flex items-center gap-2 px-6 py-3 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg font-medium transition-colors"
+                          className="flex items-center gap-2 px-6 sm:py-3 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg font-medium transition-colors text-sm sm:text-lg py-3.5"
                         >
                           Continuar y Avanzar
                         </button>
@@ -290,9 +286,9 @@ const Evaluacion = () => {
           ) : (
             mostrarComentarios && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <ComentariosAcciones 
-                  idColaborador={usuario?.idUsuario} 
-                  idEvaluador={evaluadorId} 
+                <ComentariosAcciones
+                  idColaborador={usuario?.idUsuario}
+                  idEvaluador={evaluadorId}
                   idEvaluacion={evaluacion?.idEvaluacion}
                 />
               </div>
@@ -313,11 +309,11 @@ const Evaluacion = () => {
                     {colaborador ? '¡Atención! Confirmar envío de evaluación' : 'Confirmar envío de autoevaluación'}
                   </h2>
                 </div>
-                
+
                 <p className="text-gray-700 mb-6 font-medium">
                   Estás a punto de finalizar la evaluación. Esta acción no se puede deshacer.
                 </p>
-                
+
                 {/* Recordatorio prominente sobre comentarios - Solo para evaluadores */}
                 {colaborador && (
                   <>
@@ -354,7 +350,7 @@ const Evaluacion = () => {
                     {/* Confirmación adicional - Solo para evaluadores */}
                     <div className="bg-yellow-100 border border-yellow-100 rounded-lg p-4 mb-6">
                       <p className="text-yellow-600 text-sm font-medium">
-                        <strong>⚠️ Importante:</strong> Después de enviar la evaluación, serás dirigido automáticamente 
+                        <strong>⚠️ Importante:</strong> Después de enviar la evaluación, serás dirigido automáticamente
                         a la sección de comentarios donde <strong>DEBES completar</strong> la retroalimentación para el colaborador.
                       </p>
                     </div>
@@ -370,7 +366,7 @@ const Evaluacion = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex gap-3 p-6 bg-gray-50 border-t border-gray-200">
                 <button
                   className="flex-1 px-4 py-3 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors"

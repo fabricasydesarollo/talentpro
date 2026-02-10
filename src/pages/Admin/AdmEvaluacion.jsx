@@ -118,7 +118,11 @@ const AdmEvaluacion = () => {
                       <button 
                         onClick={(e) => {
                           e.stopPropagation()
-                          setShowAsignar(true)
+                          if(currentEval?.idEvaluacion) {
+                            setShowAsignar(true)
+                            return
+                          }
+                          toast.info("Selecciona una evaluación antes de Asignar")
                         }}
                         className="flex items-center gap-1 bg-znaranja hover:bg-znaranja/90 text-white px-3 py-1 rounded text-sm transition-colors"
                       >
@@ -446,7 +450,9 @@ const AdmEvaluacion = () => {
       {/* User Assignment Modal */}
       {showAsignar && (
         <AsignarEvaluacion 
-          idEvaluacion={currentEval?.idEvaluacion} 
+          idEvaluacion={currentEval?.idEvaluacion}
+          nombre={currentEval?.nombre}
+          year={currentEval?.year}
           setShowAsignar={setShowAsignar} 
         />
       )}

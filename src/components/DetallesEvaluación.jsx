@@ -53,7 +53,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
     return (
         <div className="p-4">
             {/* Título mejorado */}
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 ">
                 <svg className="w-5 h-5 mr-2 text-zvioleta" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -102,10 +102,10 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                 ) : (
                     usuario.Evaluaciones.map((evaluacion) => (
                         <div key={evaluacion.idEvaluacion} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start">
+                            <div className="flex justify-between items-start sm:flex-row flex-col">
                                 {/* Información de la evaluación */}
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center mb-2">
+                                <div className="flex-1 min-w-0 w-full flex flex-col gap-2">
+                                    <div className="flex items-center mb-2 w-full sm:flex-row flex-col text-center sm:text-start">
                                         <h3 className="font-semibold text-gray-900 mr-3">
                                             {evaluacion.nombre} {evaluacion.year}
                                         </h3>
@@ -142,7 +142,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                 </div>
                                 
                                 {/* Botones de acción */}
-                                <div className="flex gap-2 ml-4">
+                                <div className="flex gap-2 ml-4 mt-3">
                                     <button
                                         onClick={() => { evaluarColaborador('evaluacion', idUsuario, evaluacion.idEvaluacion); setOpenModal(false); }}
                                         className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-zverde hover:bg-zverde/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zverde disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
