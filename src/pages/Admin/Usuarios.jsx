@@ -410,7 +410,7 @@ const Usuarios = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">¿Activo?</label>
                   <input
                     type="checkbox"
-                    {...register('activo', { required: "Este campo es obligatorio" })}
+                    {...register('activo', { required: isCreate ? "Este campo es obligatorio" : false })}
                     className="w-5 h-5 text-zvioleta border-gray-300 rounded focus:ring-zvioleta"
                     defaultChecked
                   />
