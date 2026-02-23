@@ -3,10 +3,13 @@ import { FaPlay, FaTimes, FaCalendarAlt, FaClock, FaExclamationTriangle, FaInfoC
 
 const IniciarEvaluacion = ({ onClose, setOnStart, fechas }) => {
   
-  const [finish, setFinish] = useState(false)
-  if (fechas.fechaHoy > fechas.fechaFin) {
-    setFinish(true)
-  }
+  // Fallbacks y parsing seguro
+  const fechaHoy = fechas?.fechaHoy ? new Date(fechas.fechaHoy) : null;
+  const fechaFin = fechas?.fechaFin ? new Date(fechas.fechaFin) : null;
+
+  // finish es un estado derivado (no usar useState aquí)
+  const finish = fechaHoy && fechaFin ? fechaHoy > fechaFin : false;
+  
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
