@@ -218,7 +218,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
                       onChange={(e) => handleAccionChange(index, 'estado', e.target.value)}
                     >
                       <option value="">Selecciona el estado</option>
-                      <option value="Por iniciar">Por iniciar</option>
+                      <option value="Por Iniciar">Por iniciar</option>
                       <option value="En curso">En curso</option>
                       <option value="Finalizado">Finalizado</option>
                     </select>

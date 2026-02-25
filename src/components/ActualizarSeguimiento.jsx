@@ -198,7 +198,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
                         required
                       >
                         <option value="">Selecciona el estado</option>
-                        <option value="Por iniciar">Por iniciar</option>
+                        <option value="Por Iniciar">Por iniciar</option>
                         <option value="En curso">En curso</option>
                         <option value="Finalizado">Finalizado</option>
                       </select>
