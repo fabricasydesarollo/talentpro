@@ -197,7 +197,6 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
                         onChange={(e) => handleAccionChange(index, 'estado', e.target.value)}
                         required
                       >
-                        <option value="">Selecciona el estado</option>
                         <option value="Por Iniciar">Por iniciar</option>
                         <option value="En curso">En curso</option>
                         <option value="Finalizado">Finalizado</option>
