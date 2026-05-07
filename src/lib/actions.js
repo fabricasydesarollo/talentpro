@@ -1,1 +1,1 @@
-export const URLBASE = `https://ide.oncologosdeloccidente.net:3012/api/v1`;
+export const URLBASE = `https://devtalentpro-dnbydra2dqc2cufa.eastus2-01.azurewebsites.net/api/v1`;
