@@ -11,6 +11,7 @@ const InformeAccionesMejora = () => {
     const [acciones, setAcciones] = useState([]);
     const [evaluaciones, setEvaluaciones] = useState([]);
     const [idEvaluacion, setIdEvaluacion] = useState(0);
+    const [empresas, setEmpresas] = useState([])
     const [idEmpresa, setIdEmpresa] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
@@ -20,8 +21,11 @@ const InformeAccionesMejora = () => {
     useEffect(() => {
         const fetchEvaluaciones = async () => {
             try {
-                const evaluacionesResponse = await axios.get(`${URLBASE}/evaluaciones/gestionar`);
+                const [evaluacionesResponse, empresasResponse] = await Promise.all([
+                    await axios.get(`${URLBASE}/evaluaciones/gestionar`),
+                    await axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.idUsuario} }),])
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
+                setEmpresas(empresasResponse.data?.data?.Empresas || [])
             } catch (error) {
                 console.error(error);
                 toast.error("Error al obtener las evaluaciones!");
@@ -39,9 +43,9 @@ const InformeAccionesMejora = () => {
         try {
             setIsLoading(true);
             setHasSearched(true);
-            const response = await axios.get(`${URLBASE}/informes/acciones`, { 
-                params: { idEvaluacion: idEvaluacion, idEmpresa: idEmpresa }, 
-                withCredentials: true 
+            const response = await axios.get(`${URLBASE}/informes/acciones`, {
+                params: { idEvaluacion: idEvaluacion, idEmpresa: idEmpresa },
+                withCredentials: true
             });
             if (response.status === 200) {
                 setAcciones(response.data?.informe || []);
@@ -83,10 +87,11 @@ const InformeAccionesMejora = () => {
         { field: 'fechaCumplimiento', headerName: 'Fecha Cumplimiento' },
     ];
 
+    console.log(empresas)
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 w-full">
             <div className="max-w-7xl mx-auto space-y-6">
-                
+
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
@@ -100,11 +105,11 @@ const InformeAccionesMejora = () => {
                         <FaSearch className="text-gray-500" size={20} />
                         <h2 className="text-lg font-medium text-gray-900">Filtros de Consulta</h2>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-4 items-end">
                         <div className="flex-1 min-w-0">
-                            <label 
-                                htmlFor="id-evaluacion" 
+                            <label
+                                htmlFor="id-evaluacion"
                                 className="block text-sm font-medium text-gray-700 mb-2"
                             >
                                 Evaluación
@@ -126,8 +131,8 @@ const InformeAccionesMejora = () => {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                            <label 
-                                htmlFor="id-empresa" 
+                            <label
+                                htmlFor="id-empresa"
                                 className="block text-sm font-medium text-gray-700 mb-2"
                             >
                                 Empresa
@@ -139,16 +144,16 @@ const InformeAccionesMejora = () => {
                                 value={idEmpresa}
                                 onChange={(e) => setIdEmpresa(Number(e.target.value))}
                             >
-                                <option value={0}>TODAS</option>
-                                {user?.Empresas?.map((empresa, index) => (
+                                <option value={0}>Todas</option>
+                                {empresas?.map((empresa, index) => (
                                     <option key={index} value={empresa.idEmpresa}>
                                         {empresa.nombre}
                                     </option>
                                 ))}
                             </select>
                         </div>
-                        
-                        <button 
+
+                        <button
                             className="bg-zvioleta hover:bg-zvioleta/90 text-white px-6 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={getAcciones}
                             disabled={idEvaluacion === 0}
@@ -189,12 +194,12 @@ const InformeAccionesMejora = () => {
                                 {acciones.length} registros
                             </span>
                         </div>
-                        
-                        <DataTable 
-                            columns={columnsTable} 
-                            data={acciones} 
-                            enableExcelExport={true} 
-                            title="Informe de Acciones de Mejora" 
+
+                        <DataTable
+                            columns={columnsTable}
+                            data={acciones}
+                            enableExcelExport={true}
+                            title="Informe de Acciones de Mejora"
                         />
                     </div>
                 )}
