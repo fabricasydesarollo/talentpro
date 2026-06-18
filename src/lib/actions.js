@@ -1,1 +1,1 @@
-export const URLBASE = `https://webapp-talentpro-anckbzhthze7aeb6.eastus2-01.azurewebsites.net/api/v1`;
+export const URLBASE = `https://ep-afdeus2talentpro-e0aqczbbaebwgkcy.a03.azurefd.net/api/v1`;
