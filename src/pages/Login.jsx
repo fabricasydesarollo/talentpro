@@ -21,7 +21,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const result = await axios.post(`${URLBASE}/usuarios/login`, { 
+      const result = await axios.post(`${URLBASE}/login`, { 
         documento: documento, 
         contrasena: password 
       }, { withCredentials: true })
