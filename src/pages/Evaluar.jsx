@@ -29,7 +29,7 @@ const Evaluar = () => {
       if (user?.user?.idUsuario) {
         try {
           setLoading(true);
-          const res = await axios.get(`${URLBASE}/evaluaciones/gestionar`);
+          const res = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
           setEvaluaciones(res.data?.data || []);
           // Setea el ID maximo por defecto
           setIdEvaluacion(res.data?.data[0]?.idEvaluacion || null);

@@ -33,7 +33,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${URLBASE}/evaluaciones/gestionar`);
+                const response = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
                 setEvaluaciones(response.data?.data || []);
             } catch (error) {
                 toast.error('Error al obtener las evaluaciones');
@@ -123,7 +123,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                     idEvaluacion: idEvaluacion
                 }];            
 
-            const res = await axios.post(`${URLBASE}/usuarios/colaboradores`, { usuarios: usuariosAsignados });
+            const res = await axios.post(`${URLBASE}/usuarios/colaboradores`, { usuarios: usuariosAsignados }, { withCredentials: true });
             toast.success(res.data.message);
             onChange(colaboradoresAsignados);
             onClose();

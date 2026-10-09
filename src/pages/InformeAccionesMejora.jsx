@@ -22,8 +22,8 @@ const InformeAccionesMejora = () => {
         const fetchEvaluaciones = async () => {
             try {
                 const [evaluacionesResponse, empresasResponse] = await Promise.all([
-                    await axios.get(`${URLBASE}/evaluaciones/gestionar`),
-                    await axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.idUsuario} }),])
+                    await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
+                    await axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.idUsuario} }, { withCredentials: true }),])
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
                 setEmpresas(empresasResponse.data?.data?.Empresas || [])
             } catch (error) {

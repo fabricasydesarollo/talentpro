@@ -13,20 +13,20 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
   const [respuestas, setRespuestas] = useState([])
   const [esEvaluador, setEsEvaluador] = useState(Number(idColaborador) != Number(idEvaluador));
   const navigate = useNavigate();
-  
+
 
   // Fetch competencias solo si es evaluador
   useEffect(() => {
-      const obtenerDatos = async () => {
-        try {
-          const responseCompetencias = await axios.get(`${URLBASE}/respuestas`, { params: { idEvaluador, idColaborador, idEvaluacion } });
-          setRespuestas(responseCompetencias.data)
-          setCompetenciasFiltradas(responseCompetencias.data?.evaluacion);
-        } catch {
-          toast.error("Ocurrió un error al obtener las competencias.");
-        }
-      };
-      obtenerDatos();
+    const obtenerDatos = async () => {
+      try {
+        const responseCompetencias = await axios.get(`${URLBASE}/respuestas`, { params: { idEvaluador, idColaborador, idEvaluacion } });
+        setRespuestas(responseCompetencias.data)
+        setCompetenciasFiltradas(responseCompetencias.data?.evaluacion);
+      } catch (error) {
+        toast.error("Ocurrió un error al obtener las competencias.");
+      }
+    };
+    obtenerDatos();
   }, [idColaborador, idEvaluador, esEvaluador, idEvaluacion, retroalimentacion]);
 
   // Manejar cambio en acciones de mejoramiento
@@ -73,47 +73,23 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
           idColaborador,
           comentario: comentariosGenerales,
           promedio,
-          accionesMejoramiento: esEvaluador ? accionesMejoramiento : [],
+          compromisos: esEvaluador ? accionesMejoramiento : [],
+          requiredCommitments: esEvaluador && competencias.length > 0,
           retroalimentacion
         };
 
-        const response = await axios.post(`${URLBASE}/evaluaciones/comentarios`, payload);
+        const response = await axios.post(`${URLBASE}/evaluaciones/comentarios`, payload, { withCredentials: true });
+        console.log("Response:", response.status, response.data);
+        toast.success("Comentarios guardados con éxito!", { position: 'top-center', toastId: 'comentarios-id-succes' });
 
-        if (response.status === 200) {
-          const idEvalRealizada = response.data?.data?.idEvalRealizada;
-          toast.success("Comentarios guardados con éxito!", {position: 'top-center', toastId: 'comentarios-id-succes'});
+        navigate("/home")
+        return
 
-          if (!esEvaluador) {
-            navigate("/home")
-            return
-          }
-
-          if (pass) {
-            for (const accion of accionesMejoramiento) {
-              const compromisoPayload = {
-                idCompetencia: accion.idCompetencia,
-                idEvalRealizada,
-                comentario: accion.comentario,
-                estado: accion.estado,
-                fechaCumplimiento: accion.fechaCumplimiento
-              };
-              await axios.post(`${URLBASE}/evaluaciones/compromisos`, compromisoPayload);
-            }
-            toast.success("Compromisos guardados con éxito!", {position: 'top-center',toastId: 'err-id-mejoramiento'});
-            setTimeout(() => {
-              navigate("/evaluar")
-            }, 1500);
-          }else{
-            toast.error('Debes registrar las acciones de mejoramiento!', {position: 'top-center', toastId: 'err-id-mejoramiento'})
-          }
-        } else {
-          toast.error('Ya has agregado un comentario!', {position: 'top-center',toastId: 'err-id-mejoramiento'});
-        }
-      } catch {
-        toast.error("Ocurrió un error en la comunicación con el servidor.");
+      } catch (error) {
+        toast.error(`Ocurrió un error al guardar los comentarios: ${error.response?.data?.message || error.message}`, { position: 'top-center', toastId: 'err-id-mejoramiento' });
       }
     } else {
-      toast.error("Debes llenar todos los campos", {position: 'top-center',toastId: 'err-id-mejoramiento'})
+      toast.error("Debes llenar todos los campos", { position: 'top-center', toastId: 'err-id-mejoramiento' })
     }
   };
 
@@ -127,7 +103,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
           </svg>
           <h2 className="text-lg font-semibold text-zvioleta">Comentarios Generales</h2>
         </div>
-        
+
         <div>
           <label htmlFor="comentarios" className="block text-sm font-medium text-gray-700 mb-1">
             Comentario <span className="text-red-500">*</span>
@@ -153,7 +129,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
             </svg>
             <h2 className="text-lg font-semibold text-zvioleta">Acciones de Mejoramiento</h2>
           </div>
-          
+
           <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
             <div className="flex items-start">
               <svg className="w-4 h-4 text-blue-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,9 +139,9 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
                 <p className="mb-1">Elabora el plan de desarrollo enfocado en competencias con puntajes por debajo de lo esperado (mínimo 1, máximo 3).</p>
                 <p>
                   Consulta las ideas en{' '}
-                  <a 
-                    href="https://grupozentria-my.sharepoint.com/:f:/g/personal/nini_cifuentes_zentria_com_co/IgDfjlLV-zrGTpS0Iixn3CetAc2Rdvh7UWwxOV1YZle_tKo?e=gVE9k6" 
-                    target="_blank" 
+                  <a
+                    href="https://grupozentria-my.sharepoint.com/:f:/g/personal/nini_cifuentes_zentria_com_co/IgDfjlLV-zrGTpS0Iixn3CetAc2Rdvh7UWwxOV1YZle_tKo?e=gVE9k6"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="underline text-znaranja hover:text-znaranja/80"
                   >
@@ -184,7 +160,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
                   <h3 className="text-sm font-medium text-gray-900">Acción de Mejoramiento #{index + 1}</h3>
                   <span className="text-xs text-gray-500">Campos requeridos *</span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {/* Competencia */}
                   <div>
@@ -217,6 +193,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
                       required
                       onChange={(e) => handleAccionChange(index, 'estado', e.target.value)}
                     >
+                      <option value="">Selecciona un estado</option>
                       <option value="Por Iniciar">Por iniciar</option>
                       <option value="En curso">En curso</option>
                       <option value="Finalizado">Finalizado</option>
@@ -258,8 +235,8 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
 
           {/* Botones para gestionar acciones */}
           <div className="flex gap-2">
-            <button 
-              onClick={agregarAccion} 
+            <button
+              onClick={agregarAccion}
               disabled={competencias.length === accionesMejoramiento.length || accionesMejoramiento.length >= 3}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-zvioleta hover:bg-zvioleta/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zvioleta disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -268,9 +245,9 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
               </svg>
               Agregar Acción
             </button>
-            
-            <button 
-              onClick={quitarAccion} 
+
+            <button
+              onClick={quitarAccion}
               disabled={accionesMejoramiento.length === 0}
               className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zvioleta disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -304,9 +281,9 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
 
       {/* Botón de envío */}
       <div className="pt-4 border-t border-gray-200">
-        <button 
-          type="button" 
-          onClick={submitComentarios} 
+        <button
+          type="button"
+          onClick={submitComentarios}
           className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-zvioleta hover:bg-zvioleta/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zvioleta transition-colors"
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

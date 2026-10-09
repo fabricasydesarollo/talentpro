@@ -196,7 +196,7 @@ const Resultados = () => {
                     <img className='w-20 h-auto' src={usuario?.Empresas[0]?.urlLogo} alt={`logo-empresa-${usuario?.Empresas[0]?.nombre}`} />
                   </div>
                   <div className='text-center p-3 border-r border-gray-400'>
-                    <h2 className='font-bold text-base'>{evaluacion?.nombre}</h2>
+                    <h2 className='font-bold text-base'>{evaluacion?.nombre || 'Aún no disponible'}</h2>
                     <p className='text-sm'>PROCESO: GESTIÓN HUMANA</p>
                   </div>
                   <div className='text-center p-3'>
@@ -219,7 +219,7 @@ const Resultados = () => {
               <td className='border border-gray-400 p-2 text-sm'>{usuario.nombre}</td>
               <td className='border border-gray-400 p-2 text-sm'>{usuario.cargo}</td>
               <td className='border border-gray-400 p-2 text-sm'>{formatearFecha(usuario.fechaIngreso)}</td>
-              <td className='border border-gray-400 p-2 text-sm'>Año {evaluacion.year}</td>
+              <td className='border border-gray-400 p-2 text-sm'>Año {evaluacion?.year || '----'}</td>
             </tr>
             <tr>
               <td className='border border-gray-400 p-2 bg-gray-100 font-semibold text-sm'>Nombre del evaluador</td>

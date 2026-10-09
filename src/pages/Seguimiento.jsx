@@ -21,7 +21,7 @@ const Seguimiento = () => {
       try {
         const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
           params: { idColaborador, idEvaluacion, idEvaluador: user.user?.idUsuario },
-        });
+        }, { withCredentials: true });
         setCompetencias(response.data?.data);
       } catch {
         toast.error("Ocurrió un error al obtener los datos.");

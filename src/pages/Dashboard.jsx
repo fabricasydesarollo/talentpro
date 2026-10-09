@@ -35,8 +35,8 @@ const DashboardUI = () => {
       try {
         const [calificacionesRes, empresasRes, evaluacionesRes] = await Promise.all([
           axios.get(`${URLBASE}/respuestas/calificacion`),
-          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }),
-          axios.get(`${URLBASE}/evaluaciones/gestionar`)
+          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }, { withCredentials: true }),
+          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true })
         ]);
         setEmpresas(empresasRes.data?.data || [])
         setCalificaciones(calificacionesRes.data?.data || []);

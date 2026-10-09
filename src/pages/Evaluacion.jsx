@@ -54,7 +54,7 @@ const Evaluacion = () => {
 
         const evaluacionResponse = await axios.get(`${URLBASE}/evaluaciones`, {
           params: dataParams
-        });
+        }, { withCredentials: true });
         setEvaluacion(evaluacionResponse.data?.data || []);
         setIsLoading(false);
       } catch (err) {
@@ -142,7 +142,7 @@ const Evaluacion = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8 w-full mx-auto">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">

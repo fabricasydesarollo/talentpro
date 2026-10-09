@@ -93,7 +93,7 @@ const Empresas = () => {
                 const response = await axios.post(`${URLBASE}/empresas`, formData)
                 toast.success(`${response.data.message}`)
             }
-            
+
             reset({ nombre: "", nit: "", idHub: "", urlLogo: null });
             setFilePreview(null);
             setFileName("");
@@ -128,7 +128,7 @@ const Empresas = () => {
                 const res = await axios.post(`${URLBASE}/empresas/sedes`, Headquarters)
                 toast.success(`${res.data?.message}`)
             }
-            
+
             resetHeadquarters({ nombre: "", siglas: "", idEmpresa: "", idCiudad: "" })
             setRefreshData(!refreshData)
         } catch (err) {
@@ -168,11 +168,11 @@ const Empresas = () => {
             try {
                 setLoading(true)
                 const [empresasData, sedesData, hubsData, ciudadesData, departamentosData] = await Promise.all([
-                    axios.get(`${URLBASE}/empresas`),
-                    axios.get(`${URLBASE}/empresas/sedes`),
-                    axios.get(`${URLBASE}/empresas/hubs`),
-                    axios.get(`${URLBASE}/ciudades`),
-                    axios.get(`${URLBASE}/ciudades/departamentos`),
+                    axios.get(`${URLBASE}/empresas`, { withCredentials: true }),
+                    axios.get(`${URLBASE}/empresas/sedes`, { withCredentials: true }),
+                    axios.get(`${URLBASE}/empresas/hubs`, { withCredentials: true }),
+                    axios.get(`${URLBASE}/ciudades`, { withCredentials: true }),
+                    axios.get(`${URLBASE}/ciudades/departamentos`, { withCredentials: true }),
                 ])
                 setDataFetch({
                     empresas: empresasData.data?.data,
@@ -202,10 +202,10 @@ const Empresas = () => {
 
     const editHeadquarters = (idSede) => {
         const headquarter = dataFetch.sedes.find(sede => sede.idSede == idSede)
-        const headquarterObj = { 
-            ...headquarter, 
-            idEmpresa: headquarter.Empresa.idEmpresa, 
-            idCiudad: headquarter.Ciudade.idCiudad 
+        const headquarterObj = {
+            ...headquarter,
+            idEmpresa: headquarter.Empresa.idEmpresa,
+            idCiudad: headquarter.Ciudade.idCiudad
         }
         resetHeadquarters(headquarterObj)
         setIdUpdate(idSede)
@@ -224,30 +224,30 @@ const Empresas = () => {
     // Filtros de búsqueda
     const filteredEmpresas = dataRender.empresas?.filter(empresa => {
         if (!searchEmpresa.trim()) return true; // Si no hay búsqueda, mostrar todos
-        
+
         const searchTerm = searchEmpresa.toLowerCase();
         const nombre = empresa?.nombre?.toLowerCase() || '';
         const nit = empresa?.nit?.toLowerCase() || '';
         const hub = empresa?.Hub?.nombre?.toLowerCase() || '';
-        
-        return nombre.includes(searchTerm) || 
-               nit.includes(searchTerm) || 
-               hub.includes(searchTerm);
+
+        return nombre.includes(searchTerm) ||
+            nit.includes(searchTerm) ||
+            hub.includes(searchTerm);
     }) || []
 
     const filteredSedes = dataRender.sedes?.filter(sede => {
         if (!searchSede.trim()) return true; // Si no hay búsqueda, mostrar todos
-        
+
         const searchTerm = searchSede.toLowerCase();
         const nombre = sede?.nombre?.toLowerCase() || '';
         const siglas = sede?.siglas?.toLowerCase() || '';
         const empresa = sede?.Empresa?.nombre?.toLowerCase() || '';
         const ciudad = sede?.Ciudade?.nombre?.toLowerCase() || '';
-        
-        return nombre.includes(searchTerm) || 
-               siglas.includes(searchTerm) || 
-               empresa.includes(searchTerm) || 
-               ciudad.includes(searchTerm);
+
+        return nombre.includes(searchTerm) ||
+            siglas.includes(searchTerm) ||
+            empresa.includes(searchTerm) ||
+            ciudad.includes(searchTerm);
     }) || []
 
     if (loading) {
@@ -282,7 +282,7 @@ const Empresas = () => {
                                     <FaBuilding className="text-zvioleta text-xl" />
                                     <h2 className="text-xl font-semibold text-zvioleta">Empresas</h2>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => showFormCreate("empresas")}
                                     className="flex items-center gap-2 text-zvioleta hover:text-zvioleta/80 transition-colors"
                                 >
@@ -314,12 +314,12 @@ const Empresas = () => {
                                             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Nombre de la Empresa
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="nombre" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="nombre"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Ingrese el nombre de la empresa"
-                                                {...register("nombre", { required: true })} 
+                                                {...register("nombre", { required: true })}
                                             />
                                         </div>
 
@@ -327,12 +327,12 @@ const Empresas = () => {
                                             <label htmlFor="nit" className="block text-sm font-medium text-gray-700 mb-1">
                                                 NIT
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="nit" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="nit"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Número de identificación tributaria"
-                                                {...register("nit", { required: true })} 
+                                                {...register("nit", { required: true })}
                                             />
                                         </div>
 
@@ -340,10 +340,10 @@ const Empresas = () => {
                                             <label htmlFor="idHub" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Hub
                                             </label>
-                                            <select 
-                                                name="idHub" 
-                                                id="idHub" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <select
+                                                name="idHub"
+                                                id="idHub"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 {...register("idHub", { required: true })}
                                             >
                                                 <option value="">Seleccione un hub</option>
@@ -401,14 +401,14 @@ const Empresas = () => {
                                         </div>
 
                                         <div className="md:col-span-2 flex justify-end gap-3 pt-4">
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 onClick={actionCancel}
                                                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                                             >
                                                 Cancelar
                                             </button>
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                                             >
@@ -461,8 +461,8 @@ const Empresas = () => {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex justify-center">
-                                                                <button 
-                                                                    onClick={() => editBussines(empresa.idEmpresa)} 
+                                                                <button
+                                                                    onClick={() => editBussines(empresa.idEmpresa)}
                                                                     className="text-blue-600 hover:text-blue-800 p-1"
                                                                     title="Editar empresa"
                                                                 >
@@ -496,7 +496,7 @@ const Empresas = () => {
                                     <FaMapMarkerAlt className="text-zvioleta text-xl" />
                                     <h2 className="text-xl font-semibold text-zvioleta">Sedes</h2>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => showFormCreate("sedes")}
                                     className="flex items-center gap-2 text-zvioleta hover:text-zvioleta/80 transition-colors"
                                 >
@@ -528,12 +528,12 @@ const Empresas = () => {
                                             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Nombre de la Sede
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="nombre" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="nombre"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Ingrese el nombre de la sede"
-                                                {...registerHeadquarters("nombre", { required: true })} 
+                                                {...registerHeadquarters("nombre", { required: true })}
                                             />
                                         </div>
 
@@ -541,12 +541,12 @@ const Empresas = () => {
                                             <label htmlFor="siglas" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Siglas
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="siglas" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="siglas"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Siglas de la sede"
-                                                {...registerHeadquarters("siglas", { required: true })} 
+                                                {...registerHeadquarters("siglas", { required: true })}
                                             />
                                         </div>
 
@@ -554,10 +554,10 @@ const Empresas = () => {
                                             <label htmlFor="idEmpresa" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Empresa
                                             </label>
-                                            <select 
-                                                name="idEmpresa" 
-                                                id="idEmpresa" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <select
+                                                name="idEmpresa"
+                                                id="idEmpresa"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 {...registerHeadquarters("idEmpresa", { required: true })}
                                             >
                                                 <option value="">Seleccione una empresa</option>
@@ -571,10 +571,10 @@ const Empresas = () => {
                                             <label htmlFor="idCiudad" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Ciudad
                                             </label>
-                                            <select 
-                                                name="idCiudad" 
-                                                id="idCiudad" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <select
+                                                name="idCiudad"
+                                                id="idCiudad"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 {...registerHeadquarters("idCiudad", { required: true })}
                                             >
                                                 <option value="">Seleccione una ciudad</option>
@@ -585,14 +585,14 @@ const Empresas = () => {
                                         </div>
 
                                         <div className="md:col-span-2 flex justify-end gap-3 pt-4">
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 onClick={actionCancel}
                                                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                                             >
                                                 Cancelar
                                             </button>
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                                             >
@@ -643,14 +643,14 @@ const Empresas = () => {
                                                         <td className="px-6 py-4 text-gray-600">{sede.Ciudade.nombre}</td>
                                                         <td className="px-6 py-4">
                                                             <div className="flex justify-center gap-2">
-                                                                <button 
-                                                                    onClick={() => editHeadquarters(sede.idSede)} 
+                                                                <button
+                                                                    onClick={() => editHeadquarters(sede.idSede)}
                                                                     className="text-blue-600 hover:text-blue-800 p-1"
                                                                     title="Editar sede"
                                                                 >
                                                                     <PiPencilSimpleLineFill className="text-lg" />
                                                                 </button>
-                                                                <button 
+                                                                <button
                                                                     onClick={() => deleteHeadquarters(sede.idSede)}
                                                                     className="text-red-600 hover:text-red-800 p-1"
                                                                     title="Eliminar sede"
@@ -685,7 +685,7 @@ const Empresas = () => {
                                     <FaMapMarkerAlt className="text-zvioleta text-xl" />
                                     <h2 className="text-xl font-semibold text-zvioleta">Departamentos</h2>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => showFormCreate("departamentos")}
                                     className="flex items-center gap-2 text-zvioleta hover:text-zvioleta/80 transition-colors"
                                 >
@@ -716,23 +716,23 @@ const Empresas = () => {
                                             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Nombre del Departamento
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="nombre" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="nombre"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Ingrese el nombre del departamento"
-                                                {...registerDepartament("nombre", { required: true })} 
+                                                {...registerDepartament("nombre", { required: true })}
                                             />
                                         </div>
                                         <div className="flex gap-3">
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 onClick={actionCancel}
                                                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                                             >
                                                 Cancelar
                                             </button>
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                                             >
@@ -753,7 +753,7 @@ const Empresas = () => {
                                     <FaCity className="text-zvioleta text-xl" />
                                     <h2 className="text-xl font-semibold text-zvioleta">Ciudades</h2>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => showFormCreate("ciudades")}
                                     className="flex items-center gap-2 text-zvioleta hover:text-zvioleta/80 transition-colors"
                                 >
@@ -785,12 +785,12 @@ const Empresas = () => {
                                             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Nombre de la Ciudad
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="nombre" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <input
+                                                type="text"
+                                                id="nombre"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 placeholder="Ingrese el nombre de la ciudad"
-                                                {...registerCity("nombre", { required: true })} 
+                                                {...registerCity("nombre", { required: true })}
                                             />
                                         </div>
 
@@ -798,10 +798,10 @@ const Empresas = () => {
                                             <label htmlFor="idDepartamento" className="block text-sm font-medium text-gray-700 mb-1">
                                                 Departamento
                                             </label>
-                                            <select 
-                                                name="idDepartamento" 
-                                                id="idDepartamento" 
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent" 
+                                            <select
+                                                name="idDepartamento"
+                                                id="idDepartamento"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-zvioleta focus:border-transparent"
                                                 {...registerCity("idDepartamento", { required: true })}
                                             >
                                                 <option value="">Seleccione un departamento</option>
@@ -814,14 +814,14 @@ const Empresas = () => {
                                         </div>
 
                                         <div className="md:col-span-2 flex justify-end gap-3 pt-4">
-                                            <button 
-                                                type="button" 
+                                            <button
+                                                type="button"
                                                 onClick={actionCancel}
                                                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                                             >
                                                 Cancelar
                                             </button>
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="px-6 py-2 bg-zvioleta hover:bg-zvioleta/90 text-white rounded-lg transition-colors"
                                             >

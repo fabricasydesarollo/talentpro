@@ -23,7 +23,7 @@ const InformesGraficas = () => {
     const fetchData = async () => {
       try {
         const [evaluacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`),
+          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
         ])
         setEvaluaciones(evaluacionesRes.data?.data || [])
 

@@ -18,7 +18,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
         setLoading(true);
         const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
           params: { idColaborador, idEvaluacion, idEvaluador }
-        });
+        },{ withCredentials: true });
         const data = response.data?.data;
         if (data) {
           setComentariosGenerales(data.comentario || '');
@@ -73,7 +73,7 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
           accionesMejoramiento
         };
 
-        const response = await axios.patch(`${URLBASE}/evaluaciones/compromisos`, payload);
+        const response = await axios.patch(`${URLBASE}/evaluaciones/compromisos`, payload, { withCredentials: true });
 
         if (response.status === 200) {
           toast.success("Datos guardados con éxito!", { position: 'top-center' });

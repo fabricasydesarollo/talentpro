@@ -129,7 +129,13 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
       });
       
     } catch (error) {
-      console.error("Error al descargar el ZIP:", error);
+      console.error("Error al descargar el ZIP:", error.status, error.message);
+      if (error.status == 400) {
+          toast.error("Error al exportar PDFs", {
+            description: "No hay información suficiente para generar los documentos PDF"
+          });
+          return;
+      }
       toast.error("Error al exportar PDFs", {
         description: error.response?.data?.message || "No se pudieron generar los documentos"
       });

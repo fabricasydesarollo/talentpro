@@ -40,8 +40,8 @@ const Usuarios = () => {
     const fetchData = async () => {
       try {
         const [perfilesRes, nivelesCargoRes] = await Promise.all([
-          axios.get(`${URLBASE}/usuarios/perfiles`),
-          axios.get(`${URLBASE}/usuarios/nivelcargos`),
+          axios.get(`${URLBASE}/usuarios/perfiles`, {withCredentials: true}),
+          axios.get(`${URLBASE}/usuarios/nivelcargos`, {withCredentials: true}),
         ]);
         setPerfiles(perfilesRes.data?.data);
         setNivelesCargo(nivelesCargoRes.data?.data);
@@ -57,7 +57,7 @@ const Usuarios = () => {
     const { idUsuario, correo } = data;
     setLoading(true);
     try {
-      const response = await axios.get(`${URLBASE}/usuarios`, { params: { idUsuario, correo } });
+      const response = await axios.get(`${URLBASE}/usuarios`, { params: { idUsuario, correo }, withCredentials: true });
       const userData = response.data?.data;
 
       if (userData) {
@@ -76,8 +76,8 @@ const Usuarios = () => {
         setShowPassword(false);
 
         const [empresasRes, colaboradoresRes] = await Promise.all([
-          axios.get(`${URLBASE}/empresas`),
-          axios.get(`${URLBASE}/usuarios/colaboradores`)
+          axios.get(`${URLBASE}/empresas`, {withCredentials: true}),
+          axios.get(`${URLBASE}/usuarios/colaboradores`, {withCredentials: true})
         ]);
         setEmpresas(empresasRes.data?.data);
         setColaboradores(colaboradoresRes.data?.data);
@@ -107,14 +107,14 @@ const Usuarios = () => {
 
   const actualizarUsuario = (data) => {
     if (isCreate) {
-      axios.post(`${URLBASE}/usuarios`, data)
+      axios.post(`${URLBASE}/usuarios`, data, { withCredentials: true })
         .then(() => {
           toast.success('Usuario creado exitosamente!.', { toastId: "create-user-success", position: 'top-center', theme: 'colored', transition: 'Flip' })
           buscarUsuario(data)
         })
         .catch(() => toast.success('Error al actualizar usuario.', { toastId: "create-user-err", position: 'top-center', theme: 'colored', transition: 'Flip' }))
     } else {
-      axios.put(`${URLBASE}/usuarios/${data.idUsuario}`, data)
+      axios.put(`${URLBASE}/usuarios/${data.idUsuario}`, data, { withCredentials: true })
         .then(() => {
           toast.success('Usuario actualizado exitosamente.')
 
@@ -174,7 +174,7 @@ const Usuarios = () => {
       repSede: data.repSede,
       activo: data.activo
     }
-    axios.post(`${URLBASE}/usuarios/empresassedes`, dataSend)
+    axios.post(`${URLBASE}/usuarios/empresassedes`, dataSend, { withCredentials: true })
       .then(res => {
         toast.success(`¡${res.data.message}!`)
         buscarUsuario(dataSend)

@@ -28,8 +28,8 @@ export const InformesExcel = () => {
       try {
         setIsLoading(true);
         const [evaluacionesRes, empresasRes] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`),
-          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } })
+          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
+          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }, { withCredentials: true })
         ]);
         setEvaluaciones(evaluacionesRes.data?.data || []);
         setEmpresas(empresasRes.data?.data || []);

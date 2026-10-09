@@ -29,7 +29,7 @@ const Home = () => {
             try {
                 const respuesta = await axios.get(`${URLBASE}/evaluaciones/disponible`, {
                     params: { idColaborador: user?.user.idUsuario, idEvaluador: user?.user.idUsuario, idEvaluacion: evaluacion ? evaluacion?.idEvaluacion : 0 }
-                });
+                }, { withCredentials: true });
 
                 if (respuesta.status === 200) {
                     if (respuesta.data?.disponible) {

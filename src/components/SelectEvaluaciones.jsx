@@ -7,7 +7,7 @@ const SelectEvaluaciones = () => {
     const idEvaluacion = useRef(null)
 
     useEffect(() => {
-        axios.get(`${URLBASE}/evaluaciones/gestionar`)
+        axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true })
             .then(res => {
                 setEvaluaciones(res.data?.data)
             })

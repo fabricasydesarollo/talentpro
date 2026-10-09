@@ -28,7 +28,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar, nombre, year }) => {
             params: {
               idEvaluacion: idEvaluacion
             }
-          })
+          }, { withCredentials: true })
         ])
         setUsuarios(usuariosRes.data?.resultados)
         setEvaluaciones(evaluacionesRes.data?.resultados)
@@ -164,7 +164,7 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar, nombre, year }) => {
         sublistas.map(sublista =>
           axios.post(`${URLBASE}/evaluaciones/asignarEvaluaciones`, {
             ListaAsignar: sublista
-          })
+          }, { withCredentials: true })
         )
       );
 

@@ -31,9 +31,9 @@ const AdmEvaluacion = () => {
     const fecthAllInfo = async () => {
 
       const [evaluacionesData, tiposData, empresasData] = await Promise.all([
-        axios.get(`${URLBASE}/evaluaciones/gestionar`),
-        axios.get(`${URLBASE}/competencias/tipo`),
-        axios.get(`${URLBASE}/empresas`),
+        axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
+        axios.get(`${URLBASE}/competencias/tipo`, { withCredentials: true }),
+        axios.get(`${URLBASE}/empresas`, { withCredentials: true }),
       ])
       setEvaluaciones(evaluacionesData.data?.data)
       setTipoCompetencias(tiposData.data?.data)
@@ -46,7 +46,7 @@ const AdmEvaluacion = () => {
 
 
   const createEvaluacion = (data) => {
-    axios.post(`${URLBASE}/evaluaciones/gestionar`, data)
+    axios.post(`${URLBASE}/evaluaciones/gestionar`, data, { withCredentials: true })
       .then(res => {
         toast.success(`${res.data.message}, Finalizado con exito!`)
         reset({ nombre: "", año: "", estado: "" })

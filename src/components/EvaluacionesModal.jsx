@@ -23,7 +23,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
     try {
       await axios.delete(`${URLBASE}/evaluaciones/disponible`, {
         params: { idEvaluacion, idEvaluador, idColaborador, idTipoEvaluacion }
-      });
+      }, { withCredentials: true });
       
       toast.success('Evaluación eliminada', {
         description: 'La evaluación se eliminó correctamente'

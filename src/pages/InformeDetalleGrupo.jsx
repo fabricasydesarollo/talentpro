@@ -18,7 +18,7 @@ const InformeDetalleGrupo = () => {
     useEffect(() => {
         const fetchEvaluaciones = async () => {
             try {
-                const evaluacionesResponse = await axios.get(`${URLBASE}/evaluaciones/gestionar`);
+                const evaluacionesResponse = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
             } catch (error) {
                 console.error(error);
