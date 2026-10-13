@@ -1,8 +1,7 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from "../../lib/actions";
 import { toast } from "sonner";
 import { FaUsers, FaSearch, FaTimes, FaCheck, FaClipboardList, FaTag } from "react-icons/fa";
+import apiClient from "../../lib/utils";
 
 const Descriptores = () => {
     const [nivelesCargo, setNivelesCargo] = useState([]);
@@ -21,9 +20,9 @@ const Descriptores = () => {
             try {
                 setLoading(true);
                 const [nivelCargoRes, competenciasRes, descriptoresRes] = await Promise.all([
-                    axios.get(`${URLBASE}/usuarios/nivelcargos`),
-                    axios.get(`${URLBASE}/competencias`),
-                    axios.get(`${URLBASE}/competencias/descriptores`)
+                    apiClient.get(`/usuarios/nivelcargos`),
+                    apiClient.get(`/competencias`),
+                    apiClient.get(`/competencias/descriptores`)
                 ]);
 
                 setNivelesCargo(nivelCargoRes.data?.data || []);
@@ -57,12 +56,12 @@ const Descriptores = () => {
         };
 
         try {
-            const response = await axios.post(`${URLBASE}/competencias/asignarCompCargo`, payload);
+            const response = await apiClient.post(`/competencias/asignarCompCargo`, payload);
             if (response.status === 201) {
                 toast.success("Competencias asignadas correctamente");
                 setSelectedNivelCargo(null);
                 // Recargar datos
-                const nivelCargoRes = await axios.get(`${URLBASE}/usuarios/nivelcargos`);
+                const nivelCargoRes = await apiClient.get(`/usuarios/nivelcargos`);
                 setNivelesCargo(nivelCargoRes.data?.data || []);
             }
         } catch (error) {
@@ -82,12 +81,12 @@ const Descriptores = () => {
         };
 
         try {
-            const response = await axios.post(`${URLBASE}/competencias/asignarDescCargo`, payload);
+            const response = await apiClient.post(`/competencias/asignarDescCargo`, payload);
             if (response.status === 201) {
                 toast.success("Descriptores asignados correctamente");
                 setSelectedNivelCargo(null);
                 // Recargar datos
-                const nivelCargoRes = await axios.get(`${URLBASE}/usuarios/nivelcargos`);
+                const nivelCargoRes = await apiClient.get(`/usuarios/nivelcargos`);
                 setNivelesCargo(nivelCargoRes.data?.data || []);
             }
         } catch (error) {

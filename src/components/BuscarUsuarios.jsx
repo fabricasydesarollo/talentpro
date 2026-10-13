@@ -1,6 +1,5 @@
-import axios from "axios"
 import { useState } from "react"
-import { URLBASE } from "../lib/actions"
+import apiClient from "../lib/utils"
 
 const BuscarUsuarios = () => {
 
@@ -9,7 +8,7 @@ const BuscarUsuarios = () => {
     const [usuarios, setUsuarios] = useState([])
 
     const buscarUsuarios = () => {
-            axios.get(`${URLBASE}/usuarios/search`, {params: {documento, nombre}})
+            apiClient.get(`/usuarios/search`, {params: {documento, nombre}})
                 .then(response => {
                     setUsuarios(response.data?.usuarios)
                 })

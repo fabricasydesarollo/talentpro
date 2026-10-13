@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types'
+import apiClient from '../lib/utils';
 
 const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
   const [comentariosGenerales, setComentariosGenerales] = useState('');
@@ -19,7 +18,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
-        const responseCompetencias = await axios.get(`${URLBASE}/respuestas`, { params: { idEvaluador, idColaborador, idEvaluacion } });
+        const responseCompetencias = await apiClient.get(`/respuestas`, { params: { idEvaluador, idColaborador, idEvaluacion } });
         setRespuestas(responseCompetencias.data)
         setCompetenciasFiltradas(responseCompetencias.data?.evaluacion);
       } catch (error) {
@@ -78,8 +77,7 @@ const ComentariosAcciones = ({ idEvaluacion, idEvaluador, idColaborador }) => {
           retroalimentacion
         };
 
-        const response = await axios.post(`${URLBASE}/evaluaciones/comentarios`, payload, { withCredentials: true });
-        console.log("Response:", response.status, response.data);
+        await apiClient.post(`/evaluaciones/comentarios`, payload);
         toast.success("Comentarios guardados con éxito!", { position: 'top-center', toastId: 'comentarios-id-succes' });
 
         navigate("/home")

@@ -1,9 +1,8 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaBuilding, FaTimes } from "react-icons/fa";
-import { URLBASE } from "../lib/actions";
 import { toast } from "sonner";
 import Loading from "../pages/Loading";
+import apiClient from "../lib/utils";
 
 const ModalAsignarEmpresas = ({ setViewModal, detalleCompetencia }) => {
 
@@ -22,7 +21,7 @@ const ModalAsignarEmpresas = ({ setViewModal, detalleCompetencia }) => {
         const fetchEmpresasDisponibles = async () => {
             try {
                 setLoading(true)
-                const response = await axios.get(`${URLBASE}/empresas`);
+                const response = await apiClient.get(`/empresas`);
                 const empresas = response.data?.data || [];
                 const empresasAsignadasIds = new Set(empresasAsignadasState.map(e => e.idEmpresa));
                 const disponibles = empresas.filter(e => !empresasAsignadasIds.has(e.idEmpresa));
@@ -43,7 +42,7 @@ const ModalAsignarEmpresas = ({ setViewModal, detalleCompetencia }) => {
 
     const handleGuardarCambios = async () => {
         try {
-            const response = await axios.put(`${URLBASE}/competencias/${detalleCompetencia?.idCompetencia}/empresas`, {
+            await apiClient.put(`/competencias/${detalleCompetencia?.idCompetencia}/empresas`, {
                 idCompetencia: detalleCompetencia.idCompetencia,
                 empresas: empresasAsignadasState.map(e => e.idEmpresa)
             });

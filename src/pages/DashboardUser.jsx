@@ -1,11 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
-import { URLBASE } from "../lib/actions";
 import { BarChartPromedio, LineChartPromedio, PieChartCumplimiento } from "../pages/GraficaAvances";
-import { Card } from "antd";
 import Loading from "./Loading";
 import { useUser } from "../context/UserContext";
-import { desviacionEstandar } from "../lib/utils";
+import apiClient, { desviacionEstandar } from "../lib/utils";
 import { FaChartBar, FaSearch, FaTachometerAlt } from 'react-icons/fa';
 
 const DashboardUser = () => {
@@ -25,7 +22,7 @@ const DashboardUser = () => {
     const fetchData = async () => {
       try {
         const [evaluacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true })
+          apiClient.get(`/evaluaciones/gestionar`)
         ]);
         setEvaluaciones(evaluacionesRes.data?.data || []);
       } catch (error) {
@@ -55,9 +52,9 @@ const DashboardUser = () => {
       setIsLoading(true);
       setHasSearched(true);
       const [calificacionesRes, competenciasRes, cubrimientoRes] = await Promise.all([
-        axios.get(`${URLBASE}/respuestas/calificacion`),
-        axios.get(`${URLBASE}/informes/resultados`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
-        axios.get(`${URLBASE}/informes/resultados/evaluador`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
+        apiClient.get(`/respuestas/calificacion`),
+        apiClient.get(`/informes/resultados`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
+        apiClient.get(`/informes/resultados/evaluador`, { params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion } }),
       ]);
       setCalificaciones(calificacionesRes.data?.data || []);
       setCubrimiento(cubrimientoRes.data?.data || []);

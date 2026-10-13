@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import DataTable from '../components/DataTable';
+import apiClient from '../lib/utils';
 
 const InformeResultadosDetalle = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
 
@@ -18,11 +17,10 @@ const InformeResultadosDetalle = ({idEvaluacion, idEmpresa, idSede, changeSelect
             try {
                 setIsLoading(true);
                 const [informeRes] = await Promise.all([
-                    axios.get(`${URLBASE}/informes/resultados/detalle`, { params: { idEmpresa, idEvaluacion, idSede }})
+                    apiClient.get(`/informes/resultados/detalle`, { params: { idEmpresa, idEvaluacion, idSede }})
                 ]);
                 setDatos(informeRes.data.informe || []);
             } catch (error) {
-                console.error('Error fetching data:', error.message);
                 toast.error('Error al cargar datos', {
                     description: 'No se pudieron obtener los resultados detallados'
                 });

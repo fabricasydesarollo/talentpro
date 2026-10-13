@@ -1,8 +1,7 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from "../lib/actions";
 import { toast } from "sonner";
 import Loading from "../pages/Loading";
+import apiClient from "../lib/utils";
 
 const ModalDescriptores = ({setOpenModal, competencia}) => {
     const [descriptores, setDescriptores] = useState([]);
@@ -11,9 +10,7 @@ const ModalDescriptores = ({setOpenModal, competencia}) => {
     useEffect(() => {
         const fetchDescriptores = async () => {
             try {
-                const response = await axios.get(`${URLBASE}/competencias/descriptores/${competencia.idCompetencia}`, {
-                    withCredentials: true
-                });
+                const response = await apiClient.get(`/competencias/descriptores/${competencia.idCompetencia}`);
                 setDescriptores(response.data?.descriptores || []);
                 setLoading(false);
             } catch (error) {

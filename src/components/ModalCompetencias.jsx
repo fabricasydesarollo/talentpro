@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'sonner';
-import { URLBASE } from '../lib/actions';
 import Loading from '../pages/Loading';
 import ModalDescriptores from './ModalDescriptores';
+import apiClient from '../lib/utils';
 
 
 const ModalCompetencias = ({ setOpenEval, competenciasAsignadas, idEvaluacion, setCurrentEval }) => {
@@ -16,7 +15,7 @@ const ModalCompetencias = ({ setOpenEval, competenciasAsignadas, idEvaluacion, s
     useEffect(() => {
         const fetchCompetencias = async () => {
             try {
-                const response = await axios.get(`${URLBASE}/competencias`);
+                const response = await apiClient.get(`/competencias`);
 
                 const competenciasData = response.data?.data || [];
                 const competenciasProcesar = competenciasData.map((competencia) => ({
@@ -59,9 +58,7 @@ const ModalCompetencias = ({ setOpenEval, competenciasAsignadas, idEvaluacion, s
                 idEvaluacion: idEvaluacion,
                 competencias: competenciasSeleccionadas.map((competencia) => competencia.idCompetencia)
             }
-            const result = await axios.post(`${URLBASE}/competencias/assignEvaluation`, dataRequest, {
-                withCredentials: true
-            })
+            const result = await apiClient.post(`/competencias/assignEvaluation`, dataRequest)
             if (result.status != 200) {
                 toast.error(result)
                 return

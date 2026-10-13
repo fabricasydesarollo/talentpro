@@ -1,6 +1,4 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from "../../lib/actions";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { FaPlus, FaTimes, FaClipboardList, FaUsers, FaBuilding, FaEdit, FaCheck } from "react-icons/fa";
@@ -9,6 +7,7 @@ import AsignarEvaluacion from "../../components/AsignarEvaluacion";
 import Loading from "../Loading";
 import ModalCompetencias from "../../components/ModalCompetencias";
 import ModalAsignarEmpresas from "../../components/ModalAsignarEmpresas";
+import apiClient from "../../lib/utils";
 
 
 const AdmEvaluacion = () => {
@@ -33,8 +32,8 @@ const AdmEvaluacion = () => {
       try {
         setLoading(true)
         const [evaluacionesData, tiposData] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
-          axios.get(`${URLBASE}/competencias/tipo`,{ withCredentials: true }),
+          apiClient.get(`/evaluaciones/gestionar`),
+          apiClient.get(`/competencias/tipo`),
         ])
         setEvaluaciones(evaluacionesData.data?.data)
         setTipoCompetencias(tiposData.data?.data)
@@ -52,7 +51,7 @@ const AdmEvaluacion = () => {
   const createEvaluacion = async (data) => {
     try {
       if (openEval.modo == 'crear') {
-        const res = await axios.post(`${URLBASE}/evaluaciones/gestionar`, data, { withCredentials: true })
+        const res = await apiClient.post(`/evaluaciones/gestionar`, data)
         toast.success(`${res.data.message}, Finalizado con éxito!`)
         reset({ nombre: "", year: "", estado: "" })
         setRefreshData(!refreshData)
@@ -63,7 +62,7 @@ const AdmEvaluacion = () => {
           activa: data.estado,
           ...data
         }
-        const res = await axios.put(`${URLBASE}/evaluaciones/gestionar`, data = info, { withCredentials: true })
+        const res = await apiClient.put(`/evaluaciones/gestionar`, data = info)
         toast.success(`${res.data.message}, Finalizado con éxito!`)
         reset({ nombre: "", year: "", estado: "" })
         setRefreshData(!refreshData)

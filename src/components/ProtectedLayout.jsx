@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Layout from './Layout';
 import { Outlet } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import axios from 'axios';
 import { toast } from 'sonner';
 import PropTypes from 'prop-types';
-import { URLBASE } from '../lib/actions.js';
+import apiClient from '../lib/utils.js';
 
 const ProtectedLayout = ({ allowedProfiles }) => {
   const navigate = useNavigate();
@@ -19,27 +18,8 @@ const ProtectedLayout = ({ allowedProfiles }) => {
       const loadingToast = toast.loading("Verificando sesión...");
 
       try {
-        let res;
-        try {
-          res = await axios.get(`${URLBASE}/usuarios/sesion`, { withCredentials: true });
-        } catch (error) {
-          const token = localStorage.getItem("token")
-          if (token) {
-            res = await axios.get(`${URLBASE}/usuarios/sesion`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-          } else {
-            toast.dismiss(loadingToast);
-            toast.error("Sesión no válida", {
-              description: "Redirigiendo al login...",
-            });
-            navigate("/");
-            return;
-          }
-        }        
-        
+        const res = await apiClient.get("/usuarios/sesion")
+
         if (!res?.data?.data || (res.data?.data?.idUsuario !== user?.user?.idUsuario)) {
           toast.dismiss(loadingToast);
           toast.error("Sesión no válida", {

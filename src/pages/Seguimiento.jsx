@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import { useParams } from 'react-router-dom';
 import ComentariosAcciones from '../components/ComentariosAcciones';
 import { useUser } from '../context/UserContext';
 import ActualizarSeguimiento from '../components/ActualizarSeguimiento';
 import Loading from './Loading';
+import apiClient from '../lib/utils.js';
 
 const Seguimiento = () => {
   const [competencias, setCompetencias] = useState([]);
@@ -19,9 +18,9 @@ const Seguimiento = () => {
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
-        const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
+        const response = await apiClient.get(`/evaluaciones/comentarios`, {
           params: { idColaborador, idEvaluacion, idEvaluador: user.user?.idUsuario },
-        }, { withCredentials: true });
+        });
         setCompetencias(response.data?.data);
       } catch {
         toast.error("Ocurrió un error al obtener los datos.");
@@ -52,8 +51,8 @@ const Seguimiento = () => {
     ) : (
       <div className='w-9/12 h-auto'>
         <ComentariosAcciones
-          idColaborador={idColaborador}
-          idEvaluacion={idEvaluacion}
+          idColaborador={Number(idColaborador)}
+          idEvaluacion={Number(idEvaluacion)}
           idEvaluador={user?.user?.idUsuario}
         />
       </div>

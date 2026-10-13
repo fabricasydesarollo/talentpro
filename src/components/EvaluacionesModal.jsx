@@ -2,9 +2,8 @@ import { useState } from 'react';
 import Modal from 'react-modal';
 import PropTypes from 'prop-types'
 import { toast } from 'sonner';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { FaTimes, FaTrash, FaCalendarAlt, FaUser, FaClipboardList, FaComment } from 'react-icons/fa';
+import apiClient from '../lib/utils.js';
 
 // Estilo básico para el modal (puedes personalizarlo)
 Modal.setAppElement('#root'); // Esto es necesario para accesibilidad
@@ -19,16 +18,14 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
 
   const handleDelete = async (idEvaluacion, idEvaluador, idTipoEvaluacion) => {
     setIsDeleting(`${idEvaluacion}-${idEvaluador}-${idTipoEvaluacion}`);
-    
+
     try {
-      await axios.delete(`${URLBASE}/evaluaciones/disponible`, {
-        params: { idEvaluacion, idEvaluador, idColaborador, idTipoEvaluacion }
-      }, { withCredentials: true });
-      
+      await apiClient.delete("/evaluaciones/disponible", { params: { idEvaluacion, idEvaluador, idColaborador, idTipoEvaluacion } })
+
       toast.success('Evaluación eliminada', {
         description: 'La evaluación se eliminó correctamente'
       });
-      
+
       if (buscarUsuario) buscarUsuario();
     } catch {
       toast.error('Error al eliminar', {
@@ -141,7 +138,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                               {`${evaluacion?.evaluacionNombre} - ${evaluacion?.year}`}
                             </h3>
                           </div>
-                          
+
                           <div className="flex flex-col gap-2 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Tipo:</span>
@@ -149,7 +146,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                                 {evaluacion?.tipoEvaluacion}
                               </span>
                             </div>
-                            
+
                             <div className="flex items-center gap-2">
                               <FaUser className="text-xs" />
                               <span className="font-medium">Evaluador:</span>
@@ -161,7 +158,7 @@ const EvaluacionesModal = ({ evaluaciones, idColaborador, buscarUsuario }) => {
                               <span className="font-medium">Comentario:</span>
                               <span className={`${evaluacion?.comentario == "Pendiente" ? "text-znaranja" : "text-zverde"}`}>{evaluacion?.comentario}</span>
                             </div>
-                            
+
                             <div className="flex items-center gap-2 md:col-span-2">
                               <FaCalendarAlt className="text-xs" />
                               <span className="font-medium">Fecha:</span>

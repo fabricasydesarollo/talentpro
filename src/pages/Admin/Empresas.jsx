@@ -1,13 +1,11 @@
-import axios from "axios";
 import { useEffect, useState } from "react"
-import { MdDelete, MdExpandLess, MdExpandMore } from "react-icons/md";
-import { URLBASE } from "../../lib/actions";
+import { MdDelete, MdExpandLess } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { PiPencilSimpleLineFill } from "react-icons/pi";
 import { toast } from "sonner";
 import { FaBuilding, FaMapMarkerAlt, FaCity, FaPlus, FaImage, FaSearch } from "react-icons/fa";
 import Pagination from "../../components/Pagination";
-import Loading from "../Loading";
+import apiClient from "../../lib/utils";
 
 const Empresas = () => {
     const [showCreate, setShowCreate] = useState({
@@ -86,11 +84,11 @@ const Empresas = () => {
 
             if (idUpdate) {
                 formData.append('idEmpresa', idUpdate)
-                const response = await axios.put(`${URLBASE}/empresas`, formData)
+                const response = await apiClient.put(`/empresas`, formData)
                 toast.success(`${response.data.message}`)
                 setIdUpdate(false)
             } else {
-                const response = await axios.post(`${URLBASE}/empresas`, formData)
+                const response = await apiClient.post(`/empresas`, formData)
                 toast.success(`${response.data.message}`)
             }
 
@@ -121,11 +119,11 @@ const Empresas = () => {
 
             if (idUpdate) {
                 const idSede = idUpdate
-                const res = await axios.patch(`${URLBASE}/empresas/sedes/${idSede}`, Headquarters)
+                const res = await apiClient.patch(`/empresas/sedes/${idSede}`, Headquarters)
                 toast.success(`${res.data?.message}`)
                 setIdUpdate(false)
             } else {
-                const res = await axios.post(`${URLBASE}/empresas/sedes`, Headquarters)
+                const res = await apiClient.post(`/empresas/sedes`, Headquarters)
                 toast.success(`${res.data?.message}`)
             }
 
@@ -139,7 +137,7 @@ const Empresas = () => {
     const createDepartment = async (data) => {
         try {
             const departamento = { nombre: data.nombre }
-            const response = await axios.post(`${URLBASE}/ciudades/departamentos`, departamento)
+            const response = await apiClient.post("/ciudades/departamentos", departamento)
             toast.success(`Departamento creado: ${response.data.message}`)
             resetDepartament({ nombre: "" })
             setRefreshData(!refreshData)
@@ -154,7 +152,7 @@ const Empresas = () => {
                 nombre: data.nombre,
                 idDepartamento: data.idDepartamento
             }
-            const res = await axios.post(`${URLBASE}/ciudades`, city)
+            const res = await apiClient.post("/ciudades", city)
             toast.success(res.data.message)
             resetCity({ nombre: "", idDepartamento: "" })
             setRefreshData(!refreshData)
@@ -168,11 +166,11 @@ const Empresas = () => {
             try {
                 setLoading(true)
                 const [empresasData, sedesData, hubsData, ciudadesData, departamentosData] = await Promise.all([
-                    axios.get(`${URLBASE}/empresas`, { withCredentials: true }),
-                    axios.get(`${URLBASE}/empresas/sedes`, { withCredentials: true }),
-                    axios.get(`${URLBASE}/empresas/hubs`, { withCredentials: true }),
-                    axios.get(`${URLBASE}/ciudades`, { withCredentials: true }),
-                    axios.get(`${URLBASE}/ciudades/departamentos`, { withCredentials: true }),
+                    apiClient.get("/empresas"),
+                    apiClient.get("/empresas/sedes"),
+                    apiClient.get("/empresas/hubs"),
+                    apiClient.get("/ciudades"),
+                    apiClient.get("/ciudades/departamentos"),
                 ])
                 setDataFetch({
                     empresas: empresasData.data?.data,
@@ -192,7 +190,7 @@ const Empresas = () => {
 
     const deleteHeadquarters = async (idSede) => {
         try {
-            const res = await axios.delete(`${URLBASE}/empresas/sedes/${idSede}`)
+            const res = await apiClient.delete(`/empresas/sedes/${idSede}`)
             toast.success(`${res.data.message}`)
             setRefreshData(!refreshData)
         } catch (err) {

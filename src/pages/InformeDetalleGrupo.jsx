@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import { toast } from 'sonner';
 import CustomTable from '../components/DataTable';
 import { FaUsers, FaSearch, FaFileAlt } from 'react-icons/fa';
+import apiClient from '../lib/utils';
 
 const InformeDetalleGrupo = () => {
     const [datos, setDatos] = useState([]);
@@ -18,7 +17,7 @@ const InformeDetalleGrupo = () => {
     useEffect(() => {
         const fetchEvaluaciones = async () => {
             try {
-                const evaluacionesResponse = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
+                const evaluacionesResponse = await apiClient.get(`/evaluaciones/gestionar`);
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
             } catch (error) {
                 console.error(error);
@@ -53,7 +52,7 @@ const InformeDetalleGrupo = () => {
         setIsLoading(true);
         setHasSearched(true);
         try {
-            const informeResponse = await axios.get(`${URLBASE}/informes/resultados/detalle`, {
+            const informeResponse = await apiClient.get(`/informes/resultados/detalle`, {
                 params: { idEvaluador: user?.user?.idUsuario, idEvaluacion: idEvaluacion },
             });
             setDatos(informeResponse.data.informe);

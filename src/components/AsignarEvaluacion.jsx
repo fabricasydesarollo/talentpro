@@ -1,7 +1,5 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from "../lib/actions";
-import { normalizarData } from "../lib/utils";
+import apiClient, { normalizarData } from "../lib/utils";
 import { FaTimes, FaSave, FaUsers, FaBuilding, FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "sonner";
 
@@ -23,12 +21,12 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar, nombre, year }) => {
       try {
         setIsLoading(true)
         const [usuariosRes, evaluacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/usuarios/obtenerListaUsuarios`),
-          axios.get(`${URLBASE}/evaluaciones/obtenerEvaluacionesAsignadas`, {
+          apiClient.get(`/usuarios/obtenerListaUsuarios`),
+          apiClient.get(`/evaluaciones/obtenerEvaluacionesAsignadas`, {
             params: {
               idEvaluacion: idEvaluacion
             }
-          }, { withCredentials: true })
+          })
         ])
         setUsuarios(usuariosRes.data?.resultados)
         setEvaluaciones(evaluacionesRes.data?.resultados)
@@ -162,9 +160,9 @@ const AsignarEvaluacion = ({ idEvaluacion, setShowAsignar, nombre, year }) => {
     try {
       await Promise.all(
         sublistas.map(sublista =>
-          axios.post(`${URLBASE}/evaluaciones/asignarEvaluaciones`, {
+          apiClient.post(`/evaluaciones/asignarEvaluaciones`, {
             ListaAsignar: sublista
-          }, { withCredentials: true })
+          })
         )
       );
 

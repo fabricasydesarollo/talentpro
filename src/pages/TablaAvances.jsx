@@ -1,7 +1,6 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
-import { URLBASE } from "../lib/actions";
 import * as XLSX from "xlsx";
+import apiClient from "../lib/utils";
 
 
 
@@ -14,7 +13,7 @@ const TablaAvances = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${URLBASE}/informes`);
+        const res = await apiClient.get(`/informes`);
         setInformes(res.data?.resp);
         setFilteredInformes(res.data?.resp); // Inicialmente, sin filtro
       } catch (error) {

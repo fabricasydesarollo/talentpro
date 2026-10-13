@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import InformeResultados from "./InformeResultados";
 import InformeResultadosDetalle from "./InformeResultadosDetalle";
-import axios from "axios";
-import { URLBASE } from "../lib/actions";
 import { useUser } from "../context/UserContext";
 import { toast } from "sonner";
-import { filtrarSedes } from "../lib/utils";
+import apiClient, { filtrarSedes } from "../lib/utils";
 import Loading from "./Loading";
 import { FaSearch, FaFileExcel, FaDownload } from 'react-icons/fa';
 
@@ -28,8 +26,8 @@ export const InformesExcel = () => {
       try {
         setIsLoading(true);
         const [evaluacionesRes, empresasRes] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
-          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }, { withCredentials: true })
+          apiClient.get(`/evaluaciones/gestionar`),
+          apiClient.get(`/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } })
         ]);
         setEvaluaciones(evaluacionesRes.data?.data || []);
         setEmpresas(empresasRes.data?.data || []);

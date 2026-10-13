@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import PropTypes from 'prop-types';
+import apiClient from '../lib/utils.js';
 
 const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
   const [comentariosGenerales, setComentariosGenerales] = useState('');
@@ -16,9 +15,9 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
     const obtenerDatos = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${URLBASE}/evaluaciones/comentarios`, {
+        const response = await apiClient.get("/evaluaciones/comentarios", {
           params: { idColaborador, idEvaluacion, idEvaluador }
-        },{ withCredentials: true });
+        });
         const data = response.data?.data;
         if (data) {
           setComentariosGenerales(data.comentario || '');
@@ -68,12 +67,12 @@ const ActualizarSeguimiento = ({idColaborador, idEvaluacion, idEvaluador}) => {
         const payload = {
           idEvaluacion,
           idEvaluador,
-          idColaborador,
+          idColaborador: Number(idColaborador),
           comentario: comentariosGenerales,
           accionesMejoramiento
         };
 
-        const response = await axios.patch(`${URLBASE}/evaluaciones/compromisos`, payload, { withCredentials: true });
+        const response = await apiClient.patch("/evaluaciones/compromisos", payload);
 
         if (response.status === 200) {
           toast.success("Datos guardados con éxito!", { position: 'top-center' });

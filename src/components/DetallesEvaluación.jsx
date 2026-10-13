@@ -2,15 +2,14 @@ import { MdCheck, MdClose } from "react-icons/md";
 import { useUser } from "../context/UserContext";
 import { useNavigation } from "../hooks/useNavigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { URLBASE } from "../lib/actions";
 import Loading from "../pages/Loading";
+import apiClient from "../lib/utils";
 
 const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborador }) => {
     const { evaluarColaborador } = useNavigation()
     const [usuario, setUsuario] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
-    
+
     const user = useUser();
 
     useEffect(() => {
@@ -18,23 +17,23 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
             const usuarioEncontrado = user?.colaboradores?.colaboradores?.find(c => c.idUsuario === idUsuario);
 
             if (usuarioEncontrado) {
-            const evaluacionesFiltradas = usuarioEncontrado.Evaluaciones?.filter(
-                e => e.idEvaluacion === idEvaluacion &&
-                    e.UsuariosEvaluaciones.idTipoEvaluacion === 2
-            ) || [];
+                const evaluacionesFiltradas = usuarioEncontrado.Evaluaciones?.filter(
+                    e => e.idEvaluacion === idEvaluacion &&
+                        e.UsuariosEvaluaciones.idTipoEvaluacion === 2
+                ) || [];
 
-            const usuarioConEvaluaciones = {
-                ...usuarioEncontrado,
-                Evaluaciones: evaluacionesFiltradas
-            };
+                const usuarioConEvaluaciones = {
+                    ...usuarioEncontrado,
+                    Evaluaciones: evaluacionesFiltradas
+                };
 
-            setUsuario(usuarioConEvaluaciones);
+                setUsuario(usuarioConEvaluaciones);
             } else {
-            setUsuario(null);
+                setUsuario(null);
             }
         } else {
             setIsLoading(true)
-            axios.get(`${URLBASE}/usuarios/misEvaluaciones`, {params: { idUsuario: idUsuario}})
+            apiClient.get(`/usuarios/misEvaluaciones`, { params: { idUsuario: idUsuario } })
                 .then(res => {
                     setUsuario({
                         ...user?.user,
@@ -45,7 +44,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                 .finally(() => setIsLoading(false))
         }
     }, [colaborador, idUsuario, idEvaluacion, user]);
-    
+
     if (isLoading) {
         return <Loading />
     }
@@ -113,7 +112,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                             {colaborador ? 'Evaluación' : 'Autoevaluación'}
                                         </span>
                                     </div>
-                                    
+
                                     <div className="flex flex-wrap gap-4 text-xs">
                                         {/* Estado */}
                                         <div className="flex items-center">
@@ -125,7 +124,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                                 {evaluacion.activa ? 'Activa' : 'Inactiva'}
                                             </span>
                                         </div>
-                                        
+
                                         {/* Completado */}
                                         <div className="flex items-center">
                                             <svg className="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +139,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {/* Botones de acción */}
                                 <div className="flex gap-2 ml-4 mt-3">
                                     <button
@@ -153,7 +152,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                         </svg>
                                         Evaluar
                                     </button>
-                                    
+
                                     <button
                                         onClick={() => { evaluarColaborador('resultados', Number(idUsuario), Number(evaluacion.idEvaluacion)); setOpenModal(false); }}
                                         className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-znaranja hover:bg-znaranja/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-znaranja disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -164,7 +163,7 @@ const DetallesEvaluación = ({ setOpenModal, idEvaluacion, idUsuario, colaborado
                                         </svg>
                                         Resultados
                                     </button>
-                                    
+
                                     {colaborador && (
                                         <button
                                             onClick={() => { evaluarColaborador('seguimiento', Number(idUsuario), Number(evaluacion.idEvaluacion)); setOpenModal(false); }}

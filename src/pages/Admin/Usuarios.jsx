@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
 import { toast } from 'sonner';
-import { URLBASE } from '../../lib/actions';
 import Modal from '../../components/Modal';
 import EvaluacionesModal from '../../components/EvaluacionesModal';
 import Pagination from '../../components/Pagination';
@@ -10,6 +8,7 @@ import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import Loading from '../Loading';
 import { FaSearch, FaUser, FaBuilding, FaPlus, FaEdit, FaEye, FaEyeSlash } from 'react-icons/fa';
+import apiClient from '../../lib/utils';
 
 
 // import TableComponent from '../../components/TableComponent';
@@ -40,8 +39,8 @@ const Usuarios = () => {
     const fetchData = async () => {
       try {
         const [perfilesRes, nivelesCargoRes] = await Promise.all([
-          axios.get(`${URLBASE}/usuarios/perfiles`, {withCredentials: true}),
-          axios.get(`${URLBASE}/usuarios/nivelcargos`, {withCredentials: true}),
+          apiClient.get(`/usuarios/perfiles`),
+          apiClient.get(`/usuarios/nivelcargos`),
         ]);
         setPerfiles(perfilesRes.data?.data);
         setNivelesCargo(nivelesCargoRes.data?.data);
@@ -57,7 +56,7 @@ const Usuarios = () => {
     const { idUsuario, correo } = data;
     setLoading(true);
     try {
-      const response = await axios.get(`${URLBASE}/usuarios`, { params: { idUsuario, correo }, withCredentials: true });
+      const response = await apiClient.get(`/usuarios`, { params: { idUsuario, correo } });
       const userData = response.data?.data;
 
       if (userData) {
@@ -76,8 +75,8 @@ const Usuarios = () => {
         setShowPassword(false);
 
         const [empresasRes, colaboradoresRes] = await Promise.all([
-          axios.get(`${URLBASE}/empresas`, {withCredentials: true}),
-          axios.get(`${URLBASE}/usuarios/colaboradores`, {withCredentials: true})
+          apiClient.get(`/empresas`),
+          apiClient.get(`/usuarios/colaboradores`)
         ]);
         setEmpresas(empresasRes.data?.data);
         setColaboradores(colaboradoresRes.data?.data);
@@ -107,14 +106,14 @@ const Usuarios = () => {
 
   const actualizarUsuario = (data) => {
     if (isCreate) {
-      axios.post(`${URLBASE}/usuarios`, data, { withCredentials: true })
+      apiClient.post(`/usuarios`, data)
         .then(() => {
           toast.success('Usuario creado exitosamente!.', { toastId: "create-user-success", position: 'top-center', theme: 'colored', transition: 'Flip' })
           buscarUsuario(data)
         })
         .catch(() => toast.success('Error al actualizar usuario.', { toastId: "create-user-err", position: 'top-center', theme: 'colored', transition: 'Flip' }))
     } else {
-      axios.put(`${URLBASE}/usuarios/${data.idUsuario}`, data, { withCredentials: true })
+      apiClient.put(`/usuarios/${data.idUsuario}`, data)
         .then(() => {
           toast.success('Usuario actualizado exitosamente.')
 
@@ -174,7 +173,7 @@ const Usuarios = () => {
       repSede: data.repSede,
       activo: data.activo
     }
-    axios.post(`${URLBASE}/usuarios/empresassedes`, dataSend, { withCredentials: true })
+    apiClient.post(`/usuarios/empresassedes`, dataSend)
       .then(res => {
         toast.success(`¡${res.data.message}!`)
         buscarUsuario(dataSend)
@@ -381,7 +380,7 @@ const Usuarios = () => {
                     placeholder={isCreate ? "Ingrese la contraseña" : "Dejar vacío para mantener la actual"}
                     className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5 pr-12"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
@@ -591,8 +590,8 @@ const Usuarios = () => {
                       }
                     </td>
                     <td className="px-6 py-4 text-center">
-                        <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" />
-                      
+                      <IoMdCheckboxOutline className="text-znaranja text-lg mx-auto" />
+
                     </td>
                     <td className="px-6 py-4 text-center">
                       <button

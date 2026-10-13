@@ -1,11 +1,10 @@
-import axios from 'axios';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import { toast } from 'sonner';
 import { FaPrint, FaArrowLeft, FaUser, FaClipboardList } from 'react-icons/fa';
 import Loading from './Loading';
+import apiClient from '../lib/utils';
 
 const Resultados = () => {
   const { idUsuario, idEvaluacion } = useParams();
@@ -87,14 +86,14 @@ const Resultados = () => {
     const fetchRespuestas = async () => {
       try {
         const [respuestasRes, calificacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/respuestas`, {
+          apiClient.get(`/respuestas`, {
             params: {
               idEvaluador: user.user.idUsuario,
               idColaborador: usuario.idUsuario,
               idEvaluacion: idEvaluacion
             }
           }),
-          axios.get(`${URLBASE}/respuestas/calificacion`, { withCredentials: true })
+          apiClient.get(`/respuestas/calificacion`)
         ]);
 
         setRespuestas(respuestasRes.data || {});

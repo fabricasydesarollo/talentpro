@@ -1,11 +1,9 @@
-import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import DataTable from '../components/DataTable';
 import { toast } from 'sonner';
-import { filtrarSedes } from '../lib/utils';
+import apiClient, { filtrarSedes } from '../lib/utils';
 import { FaSearch, FaTable, FaFileAlt } from 'react-icons/fa';
 
 
@@ -27,8 +25,8 @@ export default function TablaAvancesUI() {
         const fetchData = async () => {
             try {
                 const [evaluacionesRes, empresasRes] = await Promise.all([
-                    axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
-                    axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }, { withCredentials: true })
+                    apiClient.get(`/evaluaciones/gestionar`,),
+                    apiClient.get(`/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } })
                 ]);
 
                 setEvaluaciones(evaluacionesRes.data?.data || []);
@@ -70,12 +68,12 @@ export default function TablaAvancesUI() {
 
         setIsLoading(true);
         setHasSearched(true);
-        
-        axios.get(`${URLBASE}/informes`, {
-            params: { 
-                idEmpresa: idEmpresa, 
-                idEvaluacion: idEvaluacion, 
-                idSede: idSede === '0' ? null : idSede 
+
+        apiClient.get(`/informes`, {
+            params: {
+                idEmpresa: idEmpresa,
+                idEvaluacion: idEvaluacion,
+                idSede: idSede === '0' ? null : idSede
             }
         })
             .then(res => {
@@ -103,7 +101,7 @@ export default function TablaAvancesUI() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-                
+
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
@@ -117,18 +115,18 @@ export default function TablaAvancesUI() {
                         <FaSearch className="text-gray-500" size={20} />
                         <h2 className="text-lg font-medium text-gray-900">Filtros de Consulta</h2>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                         <div className="flex flex-col">
-                            <label 
-                                htmlFor="id-evaluacion" 
+                            <label
+                                htmlFor="id-evaluacion"
                                 className="block text-sm font-medium text-gray-700 mb-2"
                             >
                                 Evaluación
                             </label>
                             <select
                                 className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5 bg-white text-gray-900"
-                                name="evaluacion" 
+                                name="evaluacion"
                                 id="id-evaluacion"
                                 value={idEvaluacion}
                                 onChange={(e) => setIdEvaluacion(e.target.value)}
@@ -143,15 +141,15 @@ export default function TablaAvancesUI() {
                         </div>
 
                         <div className="flex flex-col">
-                            <label 
-                                htmlFor="id-empresa" 
+                            <label
+                                htmlFor="id-empresa"
                                 className="block text-sm font-medium text-gray-700 mb-2"
                             >
                                 Empresa
                             </label>
                             <select
                                 className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5 bg-white text-gray-900"
-                                name="empresa" 
+                                name="empresa"
                                 id="id-empresa"
                                 value={idEmpresa}
                                 onChange={(e) => setIdEmpresa(e.target.value)}
@@ -166,15 +164,15 @@ export default function TablaAvancesUI() {
                         </div>
 
                         <div className="flex flex-col">
-                            <label 
-                                htmlFor="id-sede" 
+                            <label
+                                htmlFor="id-sede"
                                 className="block text-sm font-medium text-gray-700 mb-2"
                             >
                                 Sede
                             </label>
                             <select
                                 className="w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zvioleta focus:border-zvioleta px-4 py-2.5 bg-white text-gray-900"
-                                name="sede" 
+                                name="sede"
                                 id="id-sede"
                                 value={idSede}
                                 onChange={(e) => setIdSede(e.target.value)}
@@ -189,8 +187,8 @@ export default function TablaAvancesUI() {
                         </div>
 
                         <div className="flex flex-col justify-end">
-                            <button 
-                                onClick={fetchData} 
+                            <button
+                                onClick={fetchData}
                                 className="bg-zvioleta hover:bg-zvioleta/90 text-white px-6 py-2.5 rounded-lg transition-colors duration-200 flex items-center gap-2 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={idEvaluacion === '0' || idEmpresa === '0'}
                             >
@@ -231,12 +229,12 @@ export default function TablaAvancesUI() {
                                 {informes.length} registros
                             </span>
                         </div>
-                        
-                        <DataTable 
-                            columns={columnsTable} 
-                            data={informes} 
-                            enableExcelExport={true} 
-                            title="Avance por responsable" 
+
+                        <DataTable
+                            columns={columnsTable}
+                            data={informes}
+                            enableExcelExport={true}
+                            title="Avance por responsable"
                         />
                     </div>
                 )}

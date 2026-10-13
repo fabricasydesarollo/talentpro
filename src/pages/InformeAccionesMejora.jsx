@@ -1,11 +1,10 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { URLBASE } from '../lib/actions.js';
 import { toast } from "sonner";
 import DataTable from "../components/DataTable";
 import { useUser } from "../context/UserContext";
 import Loading from "./Loading";
 import { FaSearch, FaClipboardList, FaFileAlt } from 'react-icons/fa';
+import apiClient from "../lib/utils";
 
 const InformeAccionesMejora = () => {
     const [acciones, setAcciones] = useState([]);
@@ -22,8 +21,8 @@ const InformeAccionesMejora = () => {
         const fetchEvaluaciones = async () => {
             try {
                 const [evaluacionesResponse, empresasResponse] = await Promise.all([
-                    await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
-                    await axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.idUsuario} }, { withCredentials: true }),])
+                    await apiClient.get(`/evaluaciones/gestionar`),
+                    await apiClient.get(`/usuarios/empresassedes`, { params: { idUsuario: user?.idUsuario} }),])
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
                 setEmpresas(empresasResponse.data?.data?.Empresas || [])
             } catch (error) {
@@ -43,9 +42,8 @@ const InformeAccionesMejora = () => {
         try {
             setIsLoading(true);
             setHasSearched(true);
-            const response = await axios.get(`${URLBASE}/informes/acciones`, {
-                params: { idEvaluacion: idEvaluacion, idEmpresa: idEmpresa },
-                withCredentials: true
+            const response = await axios.get(`/informes/acciones`, {
+                params: { idEvaluacion: idEvaluacion, idEmpresa: idEmpresa }
             });
             if (response.status === 200) {
                 setAcciones(response.data?.informe || []);

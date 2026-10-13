@@ -1,13 +1,12 @@
-import axios from "axios"
 import { useEffect, useRef, useState } from "react"
-import { URLBASE } from "../lib/actions"
+import apiClient from "../lib/utils"
 
 const SelectEvaluaciones = () => {
     const [evaluaciones, setEvaluaciones] = useState([])
     const idEvaluacion = useRef(null)
 
     useEffect(() => {
-        axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true })
+        apiClient.get(`/evaluaciones/gestionar`)
             .then(res => {
                 setEvaluaciones(res.data?.data)
             })

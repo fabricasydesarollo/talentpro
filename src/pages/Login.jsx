@@ -1,12 +1,11 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import { toast } from 'sonner';
 import { FaEye, FaEyeSlash, FaUser, FaLock } from 'react-icons/fa';
 import DesarrollandoTalentosLogo from '/Desarrollando_talentos_Logo.png'
 import DesarrollandoTalentosHome from '/Desarrollando_talentos_Home.webp'
+import apiClient from '../lib/utils.js';
 
 const Login = () => {
   const [documento, setDocumento] = useState('');
@@ -21,15 +20,15 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const result = await axios.post(`${URLBASE}/login`, { 
-        documento: documento, 
-        contrasena: password 
-      }, { withCredentials: true })
-      
+      const result = await apiClient.post("/login", {
+        documento: documento,
+        contrasena: password
+      })
+
       if (result.data?.data) {
         user?.setUser(result.data?.data);
         localStorage.setItem('token', result.data?.token);
-        
+
         toast.success('¡Bienvenido! Credenciales correctas', {
           description: `Hola ${result.data?.data.nombre}`,
         });
@@ -59,10 +58,10 @@ const Login = () => {
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-4 text-center flex justify-center flex-col items-center">
             <div className="relative">
-              <img 
-                src={DesarrollandoTalentosLogo} 
-                alt="Desarrollando Talentos Logo" 
-                className='md:w-full w-80 mb-4 drop-shadow-sm' 
+              <img
+                src={DesarrollandoTalentosLogo}
+                alt="Desarrollando Talentos Logo"
+                className='md:w-full w-80 mb-4 drop-shadow-sm'
               />
             </div>
             <div>
@@ -72,7 +71,7 @@ const Login = () => {
               <p className="text-sm text-gray-600">Ingresa tus credenciales para acceder al sistema</p>
             </div>
           </div>
-          
+
           <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-6">
             <form className="space-y-6" onSubmit={handleLogin}>
               <div className="space-y-2">
@@ -95,7 +94,7 @@ const Login = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Contraseña
@@ -128,7 +127,7 @@ const Login = () => {
                   </button>
                 </div>
               </div>
-              
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -153,14 +152,14 @@ const Login = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="mt-8">
           <p className="text-xs text-gray-500 text-center">
             Copyright &copy; 2024 Zentria. Desarrollo por Fábricas y Desarrollo TI.
           </p>
         </div>
       </div>
-      
+
       <div className="w-full md:w-1/2 md:block hidden h-auto relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-zvioleta/30 via-znaranja/20 to-transparent z-10"></div>
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-zvioleta/40 to-transparent z-20"></div>
@@ -169,7 +168,7 @@ const Login = () => {
           alt="Desarrollando Talentos Home"
           className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
         />
-        
+
         {/* Texto superpuesto opcional */}
         <div className="absolute bottom-8 left-8 z-30 text-white">
           <h2 className="text-2xl font-bold mb-2">Desarrollando Talentos</h2>

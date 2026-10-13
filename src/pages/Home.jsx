@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import Modal from 'react-modal'
 import FormUpdatePassword from '../components/FormUpdatePassword'
 import DesarrollandoTalentosBanner from '/Desarrollando_talentos_Banner.webp'
 import { FaUserCheck, FaUsers, FaInfoCircle } from 'react-icons/fa';
+import apiClient from '../lib/utils.js';
 
 const Home = () => {
     const user = useUser();
@@ -27,24 +26,22 @@ const Home = () => {
             setShowModal(user.user.defaultContrasena)
 
             try {
-                const respuesta = await axios.get(`${URLBASE}/evaluaciones/disponible`, {
-                    params: { idColaborador: user?.user.idUsuario, idEvaluador: user?.user.idUsuario, idEvaluacion: evaluacion ? evaluacion?.idEvaluacion : 0 }
-                }, { withCredentials: true });
+                const respuesta = await apiClient.get("evaluaciones/disponible", { params: { idColaborador: user?.user.idUsuario, idEvaluador: user?.user.idUsuario, idEvaluacion: evaluacion ? evaluacion?.idEvaluacion : 0 } })
 
                 if (respuesta.status === 200) {
                     if (respuesta.data?.disponible) {
-            
-                        const {total, completados} = respuesta.data.disponible[0];
+
+                        const { total, completados } = respuesta.data.disponible[0];
                         const attempt = evaluacion ? evaluacion.UsuariosEvaluaciones.attempt : 0;
                         const sumaCompletados = Number(completados) + Number(attempt);
                         const sumaTotal = Number(total) + 1;
                         const porcentage = (sumaCompletados / sumaTotal) * 100;
                         if (porcentage < 100) {
                             toast.info(`Llevas el ${porcentage.toFixed()}% de evaluaciones completadas.`, { position: "top-right", toastId: "percentage-id", autoClose: 10000 })
-                        }else{
-                            toast.success(`Evaluaciones completadas al ${porcentage.toFixed()}%`, {toastId: 'total_id'})
+                        } else {
+                            toast.success(`Evaluaciones completadas al ${porcentage.toFixed()}%`, { toastId: 'total_id' })
                         }
-                    } 
+                    }
                 } else {
                     toast.error("Error al obtener la disponibilidad.");
                 }
@@ -59,7 +56,7 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto space-y-6">
-                
+
                 {/* Header Section */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div className="bg-gradient-to-r from-zvioleta to-zvioletaopaco p-6 text-white">
@@ -68,11 +65,11 @@ const Home = () => {
                         </h1>
                         <p className="text-white/90">Desarrollando el talento de nuestra organización</p>
                     </div>
-                    
+
                     <div className="p-0">
-                        <img 
-                            src={DesarrollandoTalentosBanner} 
-                            alt="DesarrollandoTalentosBanner" 
+                        <img
+                            src={DesarrollandoTalentosBanner}
+                            alt="DesarrollandoTalentosBanner"
                             className="w-full h-auto object-cover"
                         />
                     </div>
@@ -89,7 +86,7 @@ const Home = () => {
                             <p className="text-gray-700 leading-relaxed mb-4">
                                 El propósito de esta evaluación es valorar tus <span className="font-semibold text-zvioleta">fortalezas</span> y <span className="font-semibold text-znaranja">áreas de mejora</span>, promoviendo el desarrollo continuo y el crecimiento profesional en nuestra organización.
                             </p>
-                            
+
                             <div className="bg-gray-50 border-l-4 border-zvioleta rounded-r-lg p-4">
                                 <p className="text-gray-700 font-medium">
                                     Objetivo: Identificar oportunidades de crecimiento y reconocer tus contribuciones al éxito del equipo.
@@ -107,7 +104,7 @@ const Home = () => {
                         </div>
                         <h2 className="text-xl font-bold text-gray-900">Tipos de Evaluación</h2>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Autoevaluación */}
                         <div className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
@@ -135,7 +132,7 @@ const Home = () => {
                             </p>
                         </div>
                     </div>
-                    
+
                     <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <h4 className="font-semibold text-blue-900 mb-2">¿Tienes personal a cargo?</h4>
                         <p className="text-blue-800">
@@ -148,13 +145,13 @@ const Home = () => {
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Escala de Calificación</h2>
                     <p className="text-gray-600 mb-4">Lee con detenimiento cada criterio antes de iniciar</p>
-                    
+
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 mb-4">
                         <p className="text-gray-800">
                             Al iniciar, encontrarás los criterios que forman parte de esta evaluación. Cada criterio debe ser evaluado usando la siguiente escala de calificación:
                         </p>
                     </div>
-                    
+
                     <div className="overflow-hidden rounded-lg border border-gray-200">
                         <table className="w-full text-sm">
                             <thead>
@@ -226,9 +223,9 @@ const Home = () => {
                 </div>
 
                 {/* Modal */}
-                <Modal 
-                    isOpen={showModal} 
-                    ariaHideApp={false} 
+                <Modal
+                    isOpen={showModal}
+                    ariaHideApp={false}
                     onRequestClose={closeModal}
                     className="fixed inset-0 flex items-center justify-center p-4 z-50"
                     overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"

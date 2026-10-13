@@ -1,11 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
-import { URLBASE } from "../lib/actions";
 import { BarChartPromedio, LineChartPromedio, PieChartCumplimiento } from "../pages/GraficaAvances";
-import { Card } from "antd";
 import Loading from "./Loading";
 import { useUser } from "../context/UserContext";
-import { desviacionEstandar, filtrarSedes } from "../lib/utils";
+import apiClient, { desviacionEstandar, filtrarSedes } from "../lib/utils";
 import { toast } from "sonner";
 import { FaChartBar, FaSearch, FaTachometerAlt } from 'react-icons/fa';
 
@@ -34,9 +31,9 @@ const DashboardUI = () => {
     const fetchData = async () => {
       try {
         const [calificacionesRes, empresasRes, evaluacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/respuestas/calificacion`),
-          axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }, { withCredentials: true }),
-          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true })
+          apiClient.get(`/respuestas/calificacion`),
+          apiClient.get(`/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }),
+          apiClient.get(`/evaluaciones/gestionar`)
         ]);
         setEmpresas(empresasRes.data?.data || [])
         setCalificaciones(calificacionesRes.data?.data || []);
@@ -100,7 +97,7 @@ const DashboardUI = () => {
       setIsLoading(true);
       setHasSearched(true);
       const [competenciasRes, cubrimientoRes] = await Promise.all([
-        axios.get(`${URLBASE}/informes/resultados`, {
+        apiClient.get(`/informes/resultados`, {
           params: { 
             idEmpresa: idEmpresa, 
             idEvaluacion: idEvaluacion, 
@@ -109,7 +106,7 @@ const DashboardUI = () => {
             idSede: idSede 
           },
         }),
-        axios.get(`${URLBASE}/informes/grafica/all`, { 
+        apiClient.get(`/informes/grafica/all`, { 
           params: { 
             idEmpresa: idEmpresa, 
             idEvaluacion: idEvaluacion, 

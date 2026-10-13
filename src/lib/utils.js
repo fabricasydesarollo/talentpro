@@ -78,3 +78,42 @@ export const filtrarSedes = (empresas, idEmpresa) => {
     }
     return filtrados.sort((a, b) => a.nombre.localeCompare(b.nombre))
 }
+
+import axios from "axios";
+
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
+    timeout: 30000,
+});
+
+// Interceptor Request
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+// Interceptor Response
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+
+        if (error.response?.status === 401) {
+            // localStorage.removeItem("token");
+            // window.location.href = "/login";
+            console.log(error)
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+export default apiClient;

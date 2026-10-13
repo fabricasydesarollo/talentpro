@@ -17,10 +17,9 @@ import {
   FaTable
 } from 'react-icons/fa';
 import { useUser } from '../context/UserContext';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { IoIosBusiness } from 'react-icons/io';
 import style from './layout.module.css';
+import apiClient from '../lib/utils';
 
 const Layout = ({ isMenuOpen, setIsMenuOpen }) => {
   const [isAdminSubMenuOpen, setIsAdminSubMenuOpen] = useState(false);
@@ -33,7 +32,7 @@ const Layout = ({ isMenuOpen, setIsMenuOpen }) => {
   const [empresa] = Object.values(user?.user?.Empresas || {});
 
   const handleLogout = () => {
-    axios.post(`${URLBASE}/usuarios/logout`, {}, { withCredentials: true })
+    apiClient.post(`/usuarios/logout`, {})
       .then(() => {
         user.setColaboradores(null);
         user.setUser(null);

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { BarChartAdvance, PieChartCumplimiento } from './GraficaAvances';
 import Loading from './Loading';
 import { useUser } from '../context/UserContext';
 import { toast } from 'sonner';
 import { FaSearch } from 'react-icons/fa';
+import apiClient from '../lib/utils';
 
 
 const InformesGraficas = () => {
@@ -23,7 +22,7 @@ const InformesGraficas = () => {
     const fetchData = async () => {
       try {
         const [evaluacionesRes] = await Promise.all([
-          axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true }),
+          apiClient.get(`/evaluaciones/gestionar`),
         ])
         setEvaluaciones(evaluacionesRes.data?.data || [])
 
@@ -40,8 +39,8 @@ const InformesGraficas = () => {
     try {
       setIsLoading(true)
       const [cubrimientoRes, empresasRes] = await Promise.all([
-        axios.get(`${URLBASE}/informes/grafica/all`, { params: { idEvaluacion: idEvaluacion } }),
-        axios.get(`${URLBASE}/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }),
+        apiClient.get(`/informes/grafica/all`, { params: { idEvaluacion: idEvaluacion } }),
+        apiClient.get(`/usuarios/empresassedes`, { params: { idUsuario: user?.user.idUsuario } }),
       ])
       setCubrimiento(cubrimientoRes.data?.data || [])
       setSedes(empresasRes.data?.data || [])

@@ -1,10 +1,9 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
+import { useEffect, useState, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import Loading from './Loading';
 import DetallesEvaluación from '../components/DetallesEvaluación';
 import { toast } from 'sonner';
+import apiClient from '../lib/utils';
 
 const Evaluar = () => {
   const user = useUser();
@@ -29,7 +28,7 @@ const Evaluar = () => {
       if (user?.user?.idUsuario) {
         try {
           setLoading(true);
-          const res = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
+          const res = await apiClient.get(`/evaluaciones/gestionar`);
           setEvaluaciones(res.data?.data || []);
           // Setea el ID maximo por defecto
           setIdEvaluacion(res.data?.data[0]?.idEvaluacion || null);
@@ -50,7 +49,7 @@ const Evaluar = () => {
       if (user?.user?.idUsuario && idEvaluacion) {
         try {
           setLoading(true);
-          const res = await axios.get(`${URLBASE}/usuarios/evaluar`, {
+          const res = await apiClient.get(`/usuarios/evaluar`, {
             params: {
               idUsuario: user.user.idUsuario,
               idEvaluacion: idEvaluacion,

@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { useUser } from '../context/UserContext';
 import ComentariosAcciones from '../components/ComentariosAcciones';
 import { toast } from 'sonner';
 import Loading from './Loading';
 import IniciarEvaluacion from '../components/IniciarEvaluacion';
-import { smoothScrollTo } from '../lib/utils';
+import apiClient, { smoothScrollTo } from '../lib/utils';
 import { FaUser, FaClipboardList, FaExclamationTriangle } from 'react-icons/fa';
 
 const Evaluacion = () => {
@@ -49,10 +47,10 @@ const Evaluacion = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const calificacionesResponse = await axios.get(`${URLBASE}/respuestas/calificacion`);
+        const calificacionesResponse = await apiClient.get(`/respuestas/calificacion`);
         setCalificaciones(calificacionesResponse.data?.data || []);
 
-        const evaluacionResponse = await axios.get(`${URLBASE}/evaluaciones`, {
+        const evaluacionResponse = await apiClient.get(`/evaluaciones`, {
           params: dataParams
         }, { withCredentials: true });
         setEvaluacion(evaluacionResponse.data?.data || []);
@@ -122,7 +120,7 @@ const Evaluacion = () => {
     }));
 
     try {
-      await axios.post(`${URLBASE}/respuestas`, { respuestas });
+      await apiClient.post(`/respuestas`, { respuestas });
       setCompleted(true);
       setMostrarComentarios(true);
       setShowConfirmDialog(false);

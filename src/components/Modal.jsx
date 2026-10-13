@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { toast } from 'sonner';
 import { FaTimes, FaSearch, FaArrowRight, FaArrowLeft, FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import apiClient from '../lib/utils';
 
 const normalizeList = (list) => {
     return list
@@ -33,7 +32,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${URLBASE}/evaluaciones/gestionar`, { withCredentials: true });
+                const response = await apiClient.get(`/evaluaciones/gestionar`);
                 setEvaluaciones(response.data?.data || []);
             } catch (error) {
                 toast.error('Error al obtener las evaluaciones');
@@ -123,7 +122,7 @@ const Modal = ({ showModal, type, onClose, data, idUsuario }) => {
                     idEvaluacion: idEvaluacion
                 }];            
 
-            const res = await axios.post(`${URLBASE}/usuarios/colaboradores`, { usuarios: usuariosAsignados }, { withCredentials: true });
+            const res = await apiClient.post(`/usuarios/colaboradores`, { usuarios: usuariosAsignados });
             toast.success(res.data.message);
             onChange(colaboradoresAsignados);
             onClose();

@@ -1,10 +1,9 @@
-import axios from "axios";
 import { useState } from "react";
-import { URLBASE } from "../lib/actions";
 import { useUser } from "../context/UserContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { FaLock, FaEye, FaEyeSlash, FaShieldAlt, FaCheckCircle } from "react-icons/fa";
+import apiClient from "../lib/utils";
 
 const FormUpdatePassword = () => {
   const [contrasena, setContrasena] = useState("");
@@ -38,10 +37,9 @@ const FormUpdatePassword = () => {
     setIsLoading(true);
 
     try {
-      await axios.patch(
-        `${URLBASE}/usuarios/${user.user.idUsuario}`, 
-        { contrasena, defaultContrasena: false }, 
-        { withCredentials: true }
+      await apiClient.patch(
+        `/usuarios/${user.user.idUsuario}`, 
+        { contrasena, defaultContrasena: false }
       );
       
       toast.success("Contraseña actualizada correctamente", { 

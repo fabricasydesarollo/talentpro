@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { URLBASE } from '../lib/actions.js';
 import { FaFilePdf } from 'react-icons/fa';
 import Loading from './Loading';
 import PropTypes from 'prop-types';
 import { toast } from 'sonner';
 import LoadingGenerate from '../components/LoadingGenerate';
 import DataTable from '../components/DataTable';
+import apiClient from '../lib/utils';
 
-const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
+const InformeResultados = ({ idEvaluacion, idEmpresa, idSede, changeSelect }) => {
   const [datos, setDatos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -19,12 +18,11 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const response = await axios.get(`${URLBASE}/informes/detalle`, {
-          params: {idEvaluacion, idEmpresa: idEmpresa == 0 ? null : idEmpresa, idSede: idSede == 0 ? null : idSede},
+        const response = await apiClient.get(`/informes/detalle`, {
+          params: { idEvaluacion, idEmpresa: idEmpresa == 0 ? null : idEmpresa, idSede: idSede == 0 ? null : idSede },
         });
         setDatos(response.data?.informe);
       } catch (error) {
-        console.error('Error fetching data:', error.message);
         toast.error('Error al cargar datos', {
           description: 'No se pudieron obtener los resultados'
         });
@@ -79,13 +77,12 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
     toast.info('Iniciando generación de PDFs', {
       description: `Procesando ${documentCount} ${documentCount === 1 ? 'documento' : 'documentos'}...`
     });
-  
+
     try {
-      const response = await axios.post(
-        `${URLBASE}/respuestas/pdfs`, 
+      const response = await apiClient.post(
+        `/respuestas/pdfs`,
         { idusers, idEvaluacion },
-        { 
-          withCredentials: true,
+        {
           responseType: 'blob'
         }
       );
@@ -94,17 +91,17 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
       const contentDisposition = response.headers["content-disposition"];
       const timestamp = new Date().toLocaleString('en-CA', { timeZone: 'America/Bogota' }).replace(',', '');
       let filename = `evaluaciones_${timestamp}.zip`;
-  
+
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?([^"]+)"?/);
         if (match && match[1]) {
           filename = match[1];
         }
       }
-  
+
       // Crear un Blob con los datos del ZIP
       const blob = new Blob([response.data], { type: "application/zip" });
-  
+
       // Generar un enlace de descarga dinámico
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -112,7 +109,7 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
       a.download = filename;
       document.body.appendChild(a);
       a.click();
-  
+
       // Limpiar la URL temporal
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
@@ -120,21 +117,21 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
       // Limpiar la selección después de descarga exitosa
       setSelectedRows([]);
       setClearTableSelection(true);
-      
+
       // Reset el flag de limpieza después de un breve delay
       setTimeout(() => setClearTableSelection(false), 100);
-      
+
       toast.success('PDFs generados exitosamente', {
         description: `${documentCount} documentos descargados en ${filename}`
       });
-      
+
     } catch (error) {
       console.error("Error al descargar el ZIP:", error.status, error.message);
       if (error.status == 400) {
-          toast.error("Error al exportar PDFs", {
-            description: "No hay información suficiente para generar los documentos PDF"
-          });
-          return;
+        toast.error("Error al exportar PDFs", {
+          description: "No hay información suficiente para generar los documentos PDF"
+        });
+        return;
       }
       toast.error("Error al exportar PDFs", {
         description: error.response?.data?.message || "No se pudieron generar los documentos"
@@ -162,7 +159,7 @@ const InformeResultados = ({idEvaluacion, idEmpresa, idSede, changeSelect}) => {
 
   if (isGenerate) {
     return (
-      <LoadingGenerate 
+      <LoadingGenerate
         message="Generando PDFs de Evaluaciones"
         subtitle="Estamos procesando las evaluaciones seleccionadas y generando los documentos PDF. Este proceso puede tomar varios minutos."
         selectedCount={selectedRows.length}
