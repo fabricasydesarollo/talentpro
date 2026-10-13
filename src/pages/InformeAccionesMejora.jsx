@@ -26,7 +26,6 @@ const InformeAccionesMejora = () => {
                 setEvaluaciones(evaluacionesResponse?.data?.data || []);
                 setEmpresas(empresasResponse.data?.data?.Empresas || [])
             } catch (error) {
-                console.error(error);
                 toast.error("Error al obtener las evaluaciones!");
             }
         };
@@ -42,7 +41,7 @@ const InformeAccionesMejora = () => {
         try {
             setIsLoading(true);
             setHasSearched(true);
-            const response = await axios.get(`/informes/acciones`, {
+            const response = await apiClient.get(`/informes/acciones`, {
                 params: { idEvaluacion: idEvaluacion, idEmpresa: idEmpresa }
             });
             if (response.status === 200) {
@@ -84,8 +83,6 @@ const InformeAccionesMejora = () => {
         { field: 'estado', headerName: 'Estado' },
         { field: 'fechaCumplimiento', headerName: 'Fecha Cumplimiento' },
     ];
-
-    console.log(empresas)
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 w-full">
             <div className="max-w-7xl mx-auto space-y-6">
