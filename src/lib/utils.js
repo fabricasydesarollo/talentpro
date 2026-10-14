@@ -84,7 +84,7 @@ import axios from "axios";
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
-    timeout: 30000,
+    timeout: 300000,
 });
 
 // Interceptor Request
