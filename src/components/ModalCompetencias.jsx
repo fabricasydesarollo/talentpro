@@ -25,7 +25,6 @@ const ModalCompetencias = ({ setOpenEval, competenciasAsignadas, idEvaluacion, s
 
                 setCompetencias(competenciasProcesar);
             } catch (error) {
-                console.error('Error fetching competencias:', error.message);
                 toast.error('Error al cargar competencias', {
                     description: 'No se pudieron obtener las competencias'
                 });

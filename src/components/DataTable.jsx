@@ -181,7 +181,6 @@ const DataTable = ({
         description: `Archivo ${filename} descargado correctamente (${filteredData.length} registros)`
       });
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
       toast.error('Error de exportación', {
         description: 'No se pudo generar el archivo Excel'
       });
